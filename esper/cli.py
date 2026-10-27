@@ -8,7 +8,7 @@ from esper.config import DB_PATH
 from esper.db import connect, init_schema
 from esper.storage import import_file, get_document, delete_document
 from esper.tags import get_document_by_tag, get_document_tags, normalize_tag, add_tag, remove_tag
-
+from esper.indexing import index_queued
 
 def build_parser() -> argparse.ArgumentParser:
     """Define the commands and their arguments."""
@@ -33,6 +33,7 @@ def build_parser() -> argparse.ArgumentParser:
     delete_cmd.add_argument("document_ids", nargs="+", type=int, help="document numbers as shown by list")
     delete_cmd.add_argument("-y", "--yes", action="store_true", help="do not ask for confirmation")
 
+    index_cmd = commands.add_parser("index", help="index queued documents")
 
     return parser
 
@@ -53,6 +54,8 @@ def main(argv: list[str] | None = None) -> int:
             return cmd_untag(conn, args.document_id, args.names)
         if args.command == "delete":
             return cmd_delete(conn, args.document_ids, args.yes)
+        if args.command == "index":
+            return cmd_index(conn)
     except ValueError as ve:
         print(f'error: {ve}', file=sys.stderr)
         return 1
@@ -147,3 +150,30 @@ def cmd_delete(conn: sqlite3.Connection, document_ids: list[int], assume_yes: bo
         print(f"deleted document #{doc_id} [{doc['original_name']}]")
     return exit_code
 
+def cmd_index(conn: sqlite3.Connection) -> int:
+    """Index pending documents and report failures."""
+    pending = conn.execute(
+        "SELECT id FROM documents  WHERE status IN ('queued', 'processing') ORDER BY id"
+    ).fetchall()
+    if not pending:
+        print("no documents to index")
+        return 0
+    print(f"indexing {len(pending)} documents...", flush=True)
+
+    try:
+        from esper.embedding import Embedder
+        embedder = Embedder()
+    except Exception as exc:
+        print(f"error: could not load embedding model: {exc}", file=sys.stderr)
+        return 1
+
+    indexed, failed = index_queued(conn, embedder)
+    print(f"indexed {indexed} documents")
+    
+    if failed:
+        for row in pending:
+            doc = get_document(conn, row["id"])
+            if doc["status"] == "error":
+                print(f"error: #{doc['id']} {doc['original_name']}: {doc['error']}", file=sys.stderr)
+    
+    return 1 if failed else 0

@@ -3,9 +3,12 @@
 </script>
 
 <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden="true">
-  <rect width="32" height="32" rx="9" fill="var(--bg-elev-2)" stroke="var(--border-strong)" />
-  <circle cx="16" cy="16" r="9.5" stroke="var(--accent)" stroke-width="1.6" />
-  <circle cx="16" cy="16" r="5" stroke="var(--cyan)" stroke-width="1.2" stroke-opacity=".7" />
-  <circle cx="16" cy="16" r="2.2" fill="var(--accent)" />
-  <path d="M16 3.5v4M16 24.5v4M3.5 16h4M24.5 16h4" stroke="var(--accent)" stroke-width="1.4" stroke-linecap="round" />
+  <path d="M11 3H5a2 2 0 0 0-2 2v6M21 3h6a2 2 0 0 1 2 2v6M29 21v6a2 2 0 0 1-2 2h-6M11 29H5a2 2 0 0 1-2-2v-6" stroke="currentColor" stroke-width="1.6" />
+  <circle class="lens" cx="16" cy="16" r="7" stroke="currentColor" stroke-width="1.2" stroke-dasharray="18 4" />
+  <circle cx="16" cy="16" r="2.5" fill="currentColor" />
 </svg>
+
+<style>
+  .lens { transform-origin: 16px 16px; animation: lens-turn 40s linear infinite; }
+  @keyframes lens-turn { to { transform: rotate(360deg); } }
+</style>

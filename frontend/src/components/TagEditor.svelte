@@ -35,7 +35,7 @@
     bind:value={draft}
     onkeydown={onkey}
     onblur={commit}
-    placeholder={tags.length ? 'Aggiungi…' : 'Aggiungi un’etichetta e premi Invio'}
+    placeholder="Aggiungi etichetta"
     aria-label="Nuova etichetta"
   />
   <datalist id={listId}>
@@ -61,12 +61,12 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    height: 24px;
+    min-height: 28px;
     padding: 0 4px 0 8px;
     border-radius: 999px;
     background: var(--accent-soft);
     color: var(--accent);
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 500;
   }
   .tag button {
@@ -86,10 +86,10 @@
   input {
     flex: 1;
     min-width: 120px;
-    height: 24px;
+    min-height: 28px;
     border: none;
     outline: none;
     background: transparent;
-    font-size: 13px;
+    font-size: 14px;
   }
 </style>

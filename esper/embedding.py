@@ -22,3 +22,4 @@ class Embedder:
         if not texts:
             return np.empty((0, self.dimensions), dtype = np.float32)
         return self.model.encode(texts, batch_size = self.batch_size, normalize_embeddings = True)
+

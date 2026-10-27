@@ -1,6 +1,6 @@
 // Documenti di esempio per la modalità demo (dati simulati).
 import type { DocKind, DocStatus } from '../types';
-import { blueprintArt, catArt, screenshotArt, sunsetArt } from './art';
+import { blueprintArt, catArt, screenshotArt } from './art';
 
 export interface SeedDoc {
   name: string;
@@ -97,8 +97,8 @@ I transformer sostituiscono la ricorrenza con il meccanismo di attention: ogni t
     size: 2_300_000,
     tags: ['foto', 'vacanze'],
     daysAgo: 60,
-    art: sunsetArt,
-    visual: 'Fotografia di un tramonto sul mare: cielo arancione e viola, il sole si abbassa sull’orizzonte e si riflette sull’acqua, scogliera scura in primo piano.',
+    art: () => '/demo/memory-coast.png',
+    visual: 'Fotografia in bianco e nero di un tramonto sul mare: una persona di spalle osserva l’orizzonte da una scogliera rocciosa. Il sole basso si riflette sull’acqua, tra costa e foschia.',
   },
   {
     name: 'Schema impianto elettrico cucina.png',

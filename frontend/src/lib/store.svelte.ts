@@ -5,6 +5,7 @@ import type { Doc, DocDetail, SearchHit, TagCount } from './types';
 type Theme = 'light' | 'dark';
 type View = 'grid' | 'list';
 type Sort = 'recent' | 'name' | 'size';
+type KindFilter = 'all' | 'pdf' | 'image' | 'notes';
 
 export interface Toast {
   id: number;
@@ -38,10 +39,13 @@ class AppStore {
   loadError = $state<string | null>(null);
 
   query = $state('');
+  workspace = $state<'search' | 'archive'>('search');
+  kindFilter = $state<KindFilter>('all');
   activeTags = $state<string[]>([]);
   view = $state<View>(read('esper.view', ['grid', 'list'], 'grid'));
   sort = $state<Sort>(read('esper.sort', ['recent', 'name', 'size'], 'recent'));
   theme = $state<Theme>((document.documentElement.dataset.theme as Theme) === 'light' ? 'light' : 'dark');
+  motion = $state(read('esper.motion', ['on', 'off'], 'on'));
 
   hits = $state<SearchHit[]>([]);
   searching = $state(false);
@@ -63,6 +67,26 @@ class AppStore {
     else list.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     return list;
   });
+  visibleDocs = $derived(this.sortedDocs.filter((doc) => this.matchesKind(doc)));
+  visibleHits = $derived(this.hits.filter((hit) => this.matchesKind(hit.doc)));
+
+  private matchesKind(doc: Doc) {
+    return this.kindFilter === 'all' || (this.kindFilter === 'notes'
+      ? doc.kind === 'markdown' || doc.kind === 'text'
+      : doc.kind === this.kindFilter);
+  }
+
+  navigate(workspace: 'search' | 'archive') {
+    this.workspace = workspace;
+    this.kindFilter = 'all';
+    this.setQuery('');
+    if (this.activeTags.length) this.clearFilters();
+  }
+
+  setKind(kind: KindFilter) {
+    this.kindFilter = kind;
+    this.workspace = 'archive';
+  }
 
   private unsubscribe: (() => void) | null = null;
   private refreshSeq = 0;
@@ -106,11 +130,11 @@ class AppStore {
   setQuery(q: string) {
     this.query = q;
     clearTimeout(this.searchTimer);
+    this.searchSeq++;
+    this.searchError = null;
     if (!q.trim()) {
-      this.searchSeq++;
       this.hits = [];
       this.searching = false;
-      this.searchError = null;
       return;
     }
     this.searching = true;
@@ -118,6 +142,7 @@ class AppStore {
   }
 
   async runSearch() {
+    clearTimeout(this.searchTimer);
     const q = this.query.trim();
     if (!q) return;
     const seq = ++this.searchSeq;
@@ -137,6 +162,7 @@ class AppStore {
   // ---- filtri ----------------------------------------------------------------
 
   toggleTag(tag: string) {
+    this.workspace = 'archive';
     this.activeTags = this.activeTags.includes(tag) ? this.activeTags.filter((t) => t !== tag) : [...this.activeTags, tag];
     void this.refresh();
     if (this.isSearching) void this.runSearch();
@@ -162,6 +188,12 @@ class AppStore {
     this.theme = this.theme === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = this.theme;
     write('esper.theme', this.theme);
+  }
+
+  toggleMotion() {
+    this.motion = this.motion === 'on' ? 'off' : 'on';
+    document.documentElement.dataset.motion = this.motion;
+    write('esper.motion', this.motion);
   }
 
   // ---- documenti -------------------------------------------------------------

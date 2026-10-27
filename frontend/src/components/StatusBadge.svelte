@@ -25,10 +25,10 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    height: 22px;
+    min-height: 24px;
     padding: 0 8px;
     border-radius: 999px;
-    font-size: 11.5px;
+    font-size: 12px;
     font-weight: 500;
     white-space: nowrap;
   }

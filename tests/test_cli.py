@@ -1,11 +1,17 @@
 """Tests for esper.cli: argument parsing, commands, output and exit codes."""
 
 from functools import partial
+import subprocess
+import sys
+from types import ModuleType
 
+import numpy as np
 import pytest
 
 from esper import cli
+from esper.config import EMBEDDING_DIMENSIONS
 from esper.db import connect
+from esper.indexing import index_queued
 from esper.storage import delete_document, import_file
 
 
@@ -17,6 +23,7 @@ def db_path(tmp_path, files_dir, monkeypatch):
     # files_dir defaults are bound when storage.py is loaded, so patch the functions the CLI calls
     monkeypatch.setattr(cli, "import_file", partial(import_file, files_dir=files_dir))
     monkeypatch.setattr(cli, "delete_document", partial(delete_document, files_dir=files_dir))
+    monkeypatch.setattr(cli, "index_queued", partial(index_queued, files_dir=files_dir))
     return db_path
 
 
@@ -235,3 +242,183 @@ def test_delete_missing_document_does_not_stop_the_others(run, two_docs, db_path
     assert err == "error: no document #99\n"
     assert out == "deleted document #1 [a.txt]\n"
     assert count_documents(db_path) == 1
+
+
+# --- index -------------------------------------------------------------------------
+
+
+@pytest.fixture
+def embedding_module(monkeypatch):
+    """Replace the optional model module without importing PyTorch."""
+    module = ModuleType("esper.embedding")
+    module.instances = []
+
+    class FakeEmbedder:
+        def __init__(self):
+            self.calls = []
+            module.instances.append(self)
+
+        def count_tokens(self, text):
+            return len(text.split())
+
+        def embed(self, texts):
+            self.calls.append(list(texts))
+            vectors = np.zeros((len(texts), EMBEDDING_DIMENSIONS), dtype=np.float32)
+            vectors[:, 0] = 1.0
+            return vectors
+
+    module.Embedder = FakeEmbedder
+    monkeypatch.setitem(sys.modules, "esper.embedding", module)
+    return module
+
+
+def read_document_states(db_path):
+    conn = connect(db_path)
+    try:
+        return [tuple(row) for row in conn.execute(
+            "SELECT id, status, error FROM documents ORDER BY id"
+        )]
+    finally:
+        conn.close()
+
+
+def test_index_help_describes_the_command_without_creating_a_database(run, db_path):
+    with pytest.raises(SystemExit) as exc:
+        run("index", "--help")
+    assert exc.value.code == 0
+    assert not db_path.exists()
+
+
+def test_index_rejects_a_document_id_argument(run):
+    with pytest.raises(SystemExit) as exc:
+        run("index", "1")
+    assert exc.value.code == 2
+
+
+@pytest.mark.parametrize("status", [None, "indexed", "error"])
+def test_index_without_pending_work_does_not_load_a_model(
+    run, make_file, db_path, embedding_module, status
+):
+    if status is not None:
+        run("import", str(make_file("old.txt", "Old document.")))
+        conn = connect(db_path)
+        try:
+            with conn:
+                conn.execute("UPDATE documents SET status = ?", (status,))
+        finally:
+            conn.close()
+
+    assert run("index") == (0, "no documents to index\n", "")
+    assert embedding_module.instances == []
+
+
+def test_index_processes_queued_and_interrupted_documents_with_one_model(
+    run, two_docs, db_path, embedding_module
+):
+    conn = connect(db_path)
+    try:
+        with conn:
+            conn.execute("UPDATE documents SET status = 'processing' WHERE id = 2")
+    finally:
+        conn.close()
+
+    assert run("index") == (0, "indexing 2 documents...\nindexed 2 documents\n", "")
+
+    assert len(embedding_module.instances) == 1
+    assert embedding_module.instances[0].calls == [["Hello world!"], ["Hello mondo!"]]
+    assert read_document_states(db_path) == [(1, "indexed", None), (2, "indexed", None)]
+    conn = connect(db_path)
+    try:
+        for table in ("chunks", "chunks_fts", "chunks_vec"):
+            assert conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0] == 2
+    finally:
+        conn.close()
+    assert run("index") == (0, "no documents to index\n", "")
+    assert len(embedding_module.instances) == 1
+
+
+def test_index_reports_only_new_failures_and_continues_with_other_documents(
+    run, make_file, db_path, embedding_module
+):
+    run(
+        "import",
+        str(make_file("bad.pdf", "Unsupported document.")),
+        str(make_file("good.txt", "Good document.")),
+        str(make_file("old.txt", "Previous failure.")),
+    )
+    conn = connect(db_path)
+    try:
+        with conn:
+            conn.execute("UPDATE documents SET status = 'error', error = 'Old failure' WHERE id = 3")
+    finally:
+        conn.close()
+
+    assert run("index") == (
+        1,
+        "indexing 2 documents...\nindexed 1 documents\n",
+        "error: #1 bad.pdf: UnsupportedFormatError: application/pdf\n",
+    )
+
+    assert read_document_states(db_path) == [
+        (1, "error", "UnsupportedFormatError: application/pdf"),
+        (2, "indexed", None),
+        (3, "error", "Old failure"),
+    ]
+    assert embedding_module.instances[0].calls == [["Good document."]]
+    assert run("index") == (0, "no documents to index\n", "")
+    assert len(embedding_module.instances) == 1
+
+
+@pytest.mark.parametrize("failure", ["import", "initialization"])
+def test_index_reports_model_loading_failure_without_changing_document_states(
+    run, two_docs, db_path, embedding_module, monkeypatch, failure
+):
+    if failure == "import":
+        monkeypatch.setitem(sys.modules, "esper.embedding", None)
+    else:
+        def fail_to_load():
+            raise RuntimeError("Model unavailable")
+
+        embedding_module.Embedder = fail_to_load
+    before = read_document_states(db_path)
+
+    exit_code, out, err = run("index")
+
+    assert exit_code == 1
+    assert out == "indexing 2 documents...\n"
+    assert err.startswith("error: could not load embedding model:")
+    assert "Traceback" not in err
+    assert read_document_states(db_path) == before
+
+
+def test_index_returns_failure_when_all_documents_are_unsupported(run, make_file, embedding_module):
+    run("import", str(make_file("bad.pdf", "Unsupported PDF.")))
+
+    assert run("index") == (
+        1,
+        "indexing 1 documents...\nindexed 0 documents\n",
+        "error: #1 bad.pdf: UnsupportedFormatError: application/pdf\n",
+    )
+    assert len(embedding_module.instances) == 1
+    assert embedding_module.instances[0].calls == []
+
+
+def test_unrelated_commands_and_empty_index_do_not_import_the_embedding_module(tmp_path):
+    script = """
+import sys
+from pathlib import Path
+from esper import cli
+
+cli.DB_PATH = Path(sys.argv[1])
+assert cli.main(['list']) == 0
+assert cli.main(['index']) == 0
+assert 'esper.embedding' not in sys.modules
+assert 'torch' not in sys.modules
+"""
+    result = subprocess.run(
+        [sys.executable, "-c", script, str(tmp_path / "test.db")],
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    assert result.returncode == 0, result.stderr

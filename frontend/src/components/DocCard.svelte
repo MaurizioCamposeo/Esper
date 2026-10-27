@@ -4,147 +4,46 @@
   import { app } from '../lib/store.svelte';
   import StatusBadge from './StatusBadge.svelte';
   import Thumb from './Thumb.svelte';
-
+  import Icon from './Icon.svelte';
   let { doc, view }: { doc: Doc; view: 'grid' | 'list' } = $props();
-  const shownTags = $derived(doc.tags.slice(0, 3));
+  const shownTags = $derived(doc.tags.slice(0, 2));
   const extra = $derived(doc.tags.length - shownTags.length);
 </script>
 
 {#if view === 'grid'}
-  <button class="card" onclick={() => app.openDoc(doc.id)} title={doc.name}>
+  <button class="card" style:--reveal-delay="{Math.min(doc.id % 6, 5) * 35}ms" onclick={() => app.openDoc(doc.id)} aria-label={`Apri ${doc.name}`} title={doc.name}>
     <Thumb {doc} />
-    {#if doc.status !== 'indexed'}
-      <span class="status"><StatusBadge {doc} /></span>
-    {/if}
-    {#if doc.status === 'processing'}
-      <span class="bar"><span style:width="{Math.round(doc.progress * 100)}%"></span></span>
-    {/if}
-    <span class="body">
-      <span class="name">{doc.name}</span>
-      <span class="meta">{KIND_LABEL[doc.kind]} · {formatSize(doc.size)} · {formatRelative(doc.createdAt)}</span>
-      <span class="tags">
-        {#each shownTags as t}<span class="chip">{t}</span>{/each}
-        {#if extra > 0}<span class="chip">+{extra}</span>{/if}
-      </span>
-    </span>
+    {#if doc.status !== 'indexed'}<span class="status"><StatusBadge {doc} /></span>{/if}
+    <span class="body"><span class="name">{doc.name}</span><span class="meta">{formatSize(doc.size)}<span>·</span>{formatRelative(doc.createdAt)}</span><span class="bottom"><span class="tags">{#each shownTags as tag}<span class="chip">{tag}</span>{/each}{#if extra > 0}<span class="extra">+{extra}</span>{/if}</span><span class="open"><Icon name="arrow-up-right" size={13} /></span></span></span>
+    {#if doc.status === 'processing'}<span class="bar"><span style:width="{Math.round(doc.progress * 100)}%"></span></span>{/if}
   </button>
 {:else}
-  <button class="row" onclick={() => app.openDoc(doc.id)} title={doc.name}>
-    <Thumb {doc} compact />
-    <span class="info">
-      <span class="name">{doc.name}</span>
-      <span class="tags">
-        {#each shownTags as t}<span class="chip">{t}</span>{/each}
-        {#if extra > 0}<span class="chip">+{extra}</span>{/if}
-      </span>
-    </span>
-    <span class="cell hide-sm">{KIND_LABEL[doc.kind]}</span>
-    <span class="cell hide-sm">{formatSize(doc.size)}</span>
-    <span class="cell hide-sm">{formatRelative(doc.createdAt)}</span>
-    <span class="cell"><StatusBadge {doc} /></span>
+  <button class="row" onclick={() => app.openDoc(doc.id)} aria-label={`Apri ${doc.name}`} title={doc.name}>
+    <span class="identity"><Thumb {doc} compact /><span class="info"><span class="name">{doc.name}</span><span class="row-tags">{doc.tags.join(' · ')}</span></span></span>
+    <span class="cell hide-sm">{KIND_LABEL[doc.kind]}</span><span class="cell hide-sm">{formatSize(doc.size)}</span><span class="cell hide-sm">{formatRelative(doc.createdAt)}</span><span class="cell"><StatusBadge {doc} /></span>
   </button>
 {/if}
 
 <style>
-  button {
-    text-align: left;
-    background: var(--bg-elev);
-    border: 1px solid var(--border);
-    animation: rise 0.28s ease both;
-    transition: border-color 0.15s, transform 0.15s, background 0.15s;
-  }
-  button:hover {
-    border-color: var(--border-strong);
-  }
-  .card {
-    position: relative;
-    display: block;
-    padding: 0;
-    overflow: hidden;
-    border-radius: var(--radius);
-  }
-  .card:hover {
-    transform: translateY(-2px);
-    border-color: var(--accent);
-  }
-  .status {
-    position: absolute;
-    top: 8px;
-    left: 8px;
-  }
-  .bar {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 3px;
-    background: var(--border);
-  }
-  .bar > span {
-    display: block;
-    height: 100%;
-    background: var(--cyan);
-    transition: width 0.4s ease;
-  }
-  .body {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    padding: 12px 14px 14px;
-  }
-  .name {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    font-weight: 600;
-    line-height: 1.35;
-    word-break: break-word;
-  }
-  .meta {
-    color: var(--text-faint);
-    font-size: 12px;
-  }
-  .tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    margin-top: 4px;
-    min-height: 22px;
-  }
-  .row {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) 90px 80px 130px 130px;
-    align-items: center;
-    gap: 14px;
-    width: 100%;
-    padding: 8px 14px 8px 10px;
-    border-radius: 10px;
-  }
-  .row:hover {
-    background: var(--bg-hover);
-  }
-  .info {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    min-width: 0;
-  }
-  .row .name {
-    -webkit-line-clamp: 1;
-    line-clamp: 1;
-  }
-  .cell {
-    color: var(--text-dim);
-    font-size: 13px;
-  }
-  @media (max-width: 760px) {
-    .row {
-      grid-template-columns: auto minmax(0, 1fr) auto;
-    }
-    .hide-sm {
-      display: none;
-    }
-  }
+  button { text-align: left; transition: background .15s, border-color .15s; }
+  .card { position: relative; display: block; width: 100%; padding: 0; overflow: hidden; border: 1px solid var(--border); border-radius: 1px; background: var(--bg-elev); animation: rise .35s both; animation-delay: var(--reveal-delay, 0ms); }
+  .card:hover { border-color: var(--text-faint); }
+  .body { display: flex; flex-direction: column; gap: 7px; padding: 13px 14px 12px; }
+  .name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 500; letter-spacing: -.01em; }
+  .meta { display: flex; align-items: center; gap: 7px; color: var(--text-faint); font-size: 12px; }
+  .meta > span { color: var(--border-strong); }
+  .bottom { display: flex; align-items: center; justify-content: space-between; gap: 7px; min-height: 23px; margin-top: 3px; }
+  .tags { display: flex; align-items: center; gap: 5px; min-width: 0; overflow: hidden; }
+  .extra { color: var(--text-faint); font: 11px var(--mono); }
+  .open { display: flex; align-items: center; gap: 8px; color: var(--text-faint); }
+  .status { position: absolute; left: 9px; top: 9px; }
+  .bar { display: block; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--border); }
+  .bar > span { display: block; height: 100%; background: var(--text-dim); transition: width .4s; }
+  .row { display: grid; grid-template-columns: minmax(0, 1fr) 70px 80px 96px 128px; align-items: center; gap: 14px; width: 100%; padding: 13px 12px; border: 0; border-bottom: 1px solid var(--border); background: transparent; }
+  .row:hover { background: var(--bg-elev); }
+  .identity { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .info { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+  .row-tags { color: var(--text-faint); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cell { color: var(--text-dim); font-size: 12px; }
+  @media (max-width: 760px) { .row { grid-template-columns: minmax(0, 1fr) 110px; gap: 10px; } .hide-sm { display: none; } }
 </style>

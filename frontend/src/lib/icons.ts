@@ -7,6 +7,13 @@ const rect = (x: number, y: number, w: number, h: number, r: number) =>
 const FILE = ['M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z', 'M14 3v5h5'];
 
 export const ICONS = {
+  focus: ['M8 3H3v5M16 3h5v5M21 16v5h-5M8 21H3v-5', circle(12, 12, 4)],
+  pause: ['M8 5v14M16 5v14'],
+  play: ['m8 4 12 8-12 8z'],
+  'arrow-right': ['M5 12h14m-5-5 5 5-5 5'],
+  'arrow-up-right': ['M6 18 18 6M6 6h12v12'],
+  'chevron-right': ['m9 5 7 7-7 7'],
+  lock: ['M7 10V7a5 5 0 0 1 10 0v3', rect(4, 10, 16, 11, 2), 'M12 14v3'],
   search: [circle(11, 11, 7), 'm20 20-3.5-3.5'],
   upload: ['M12 16V4m0 0-4 4m4-4 4 4', 'M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3'],
   file: FILE,
