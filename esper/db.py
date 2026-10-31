@@ -32,6 +32,18 @@ CREATE TABLE IF NOT EXISTS document_tags (
 
 CREATE INDEX IF NOT EXISTS idx_document_tags_tag ON document_tags(tag_id);
 
+CREATE TABLE IF NOT EXISTS index_settings (
+    id                   INTEGER PRIMARY KEY CHECK (id = 1),
+    model_name           TEXT NOT NULL,
+    dimensions           INTEGER NOT NULL CHECK (dimensions > 0),
+    chunk_max_tokens     INTEGER NOT NULL CHECK (chunk_max_tokens > 0),
+    chunk_overlap_tokens INTEGER NOT NULL
+        CHECK (
+            chunk_overlap_tokens >= 0
+            AND chunk_overlap_tokens < chunk_max_tokens
+        )
+);
+
 CREATE TABLE IF NOT EXISTS chunks (
     id          INTEGER PRIMARY KEY,
     document_id INTEGER NOT NULL REFERENCES documents(id) ON DELETE CASCADE,

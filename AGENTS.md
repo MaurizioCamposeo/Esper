@@ -60,7 +60,35 @@ natural-language descriptions through hybrid semantic and keyword search.
 3. Briefly establish the current step and resume guiding from there. Do not
    interpret an unfinished checkpoint as permission to implement it autonomously.
 
-## Active work — interface redesign, 2026-10-27
+## Active backend work — 2026-10-29
+
+- The user explicitly resumed phase 2, step 7: full reindexing and tracking
+  the settings used to build the index. Continue in the guide role; the user
+  writes application code and the assistant handles supporting tests.
+- Keep bge-m3 as the active model and set aside Gemma work for now. The earlier
+  discussion concerned future support for either text model, not mixing their
+  vectors. Gemma download completion has not been checked since that discussion.
+- The user favors eventual desktop delivery. Continue building the CLI/core
+  with reusable boundaries; no desktop framework has been selected or added.
+- Current inspection still shows the pipeline and CLI from commit `50ffb17`;
+  index-settings tracking and full reindexing remain unimplemented. The known
+  oversized-word chunking gap must also be fixed before phase 2 is complete.
+- On 2026-10-31 the user implemented the frozen `IndexSettings` dataclass in
+  `esper/index_settings.py`, with model name, dimensions, chunk maximum and
+  overlap fields. A lightweight check verified construction, equality,
+  detection of different settings, immutability, and no heavy model imports.
+- The user added the `index_settings` table in `esper/db.py`, with a singleton
+  row and constraints for positive dimensions/chunk maximum and valid overlap.
+  Added 19 supporting schema test cases, including persisted settings and an
+  existing index receiving the empty metadata table without changing its data.
+  The full suite passed: 214 tests. Only temporary databases were used.
+- The next guided step is `get_index_settings(conn)` in
+  `esper/index_settings.py`, returning `IndexSettings` or `None` when no row
+  exists. Read/write helpers and pipeline integration are not implemented yet.
+  Existing indexes without metadata must not be labelled automatically from
+  the current configuration.
+
+## Interface redesign checkpoint — 2026-10-27
 
 - The user explicitly deferred backend phase 2, step 7 to focus on a complete
   redesign of the existing Svelte frontend. Do not resume step 7 automatically.
@@ -148,6 +176,29 @@ natural-language descriptions through hybrid semantic and keyword search.
   guide them through addressing it as well as the pending reindexing/settings
   step before declaring phase 2 complete. Do not resume backend implementation
   automatically merely because the issue is recorded here.
+
+## EmbeddingGemma 2 compatibility review — 2026-10-28
+
+- At the user's request, reviewed `google/embeddinggemma-2` against the current
+  embedding wrapper and indexing pipeline. This was research, not a decision
+  to replace bge-m3 or permission to start the next backend milestone.
+- Local Hugging Face cache contains bge-m3, with no Gemma model found in the
+  checked caches/model directories. The local Ollama list contains only
+  `glm-ocr:q8_0`; no Gemma model is installed there.
+- Installed packages are sentence-transformers 6.1.0, transformers 5.19.0,
+  and torch 2.14.1+cpu. Offline inspection confirmed the installed Transformers
+  recognizes EmbeddingGemma2Config and SentenceTransformer supports
+  `config_kwargs` for disabling unused modality encoders. No Gemma weights
+  were downloaded and no real Gemma inference was performed.
+- Future text support can reuse the pipeline, but needs document/query prompts,
+  suitable loading options, and index settings tracking plus full rebuilding.
+  Gemma outputs 768 dimensions; the present schema expects 1024. A temporary
+  in-memory database confirmed that inserting a 768-dimensional vector fails.
+  Changing the config alone cannot migrate an existing vector table.
+- Gemma's multimodal capabilities would require additional media processing
+  and index metadata; the current backend extractor supports only TXT/Markdown.
+  Quality and CPU speed relative to bge-m3 have not been measured for Esper.
+- Application code and the real archive/database were left unchanged.
 
 ## Backend checkpoint — 2026-10-27
 

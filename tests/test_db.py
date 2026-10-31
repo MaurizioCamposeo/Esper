@@ -60,7 +60,7 @@ def test_init_schema_is_idempotent(conn):
 def test_tables_exist(conn):
     rows = conn.execute("SELECT name FROM sqlite_master WHERE type = 'table'").fetchall()
     # FTS5 and vec0 also create their own shadow tables (chunks_fts_data, chunks_vec_info, ...)
-    assert {"documents", "tags", "document_tags", "chunks", "chunks_fts", "chunks_vec"} <= {row["name"] for row in rows}
+    assert {"documents", "tags", "document_tags", "index_settings", "chunks", "chunks_fts", "chunks_vec"} <= {row["name"] for row in rows}
 
 
 def test_virtual_tables_use_the_expected_modules(conn):
@@ -95,6 +95,97 @@ def test_document_defaults(conn):
     assert row["error"] is None
     # ISO 8601 UTC, e.g. 2026-10-11T14:32:05.123Z
     assert row["created_at"].endswith("Z") and "T" in row["created_at"]
+
+
+# --- Index settings ------------------------------------------------------------
+
+
+def test_index_settings_start_unknown(conn):
+    assert conn.execute("SELECT * FROM index_settings").fetchall() == []
+
+
+@pytest.mark.parametrize("overlap", [0, 399])
+def test_index_settings_accept_valid_overlap_boundaries(conn, overlap):
+    conn.execute(
+        "INSERT INTO index_settings VALUES (?, ?, ?, ?, ?)",
+        (1, "BAAI/bge-m3", 1024, 400, overlap),
+    )
+    row = conn.execute("SELECT * FROM index_settings WHERE id = 1").fetchone()
+    assert tuple(row) == (1, "BAAI/bge-m3", 1024, 400, overlap)
+
+
+@pytest.mark.parametrize(
+    "values",
+    [
+        (0, "BAAI/bge-m3", 1024, 400, 50),
+        (2, "BAAI/bge-m3", 1024, 400, 50),
+        (1, "BAAI/bge-m3", 0, 400, 50),
+        (1, "BAAI/bge-m3", -1, 400, 50),
+        (1, "BAAI/bge-m3", 1024, 0, 0),
+        (1, "BAAI/bge-m3", 1024, -1, 0),
+        (1, "BAAI/bge-m3", 1024, 400, -1),
+        (1, "BAAI/bge-m3", 1024, 400, 400),
+        (1, "BAAI/bge-m3", 1024, 400, 401),
+    ],
+)
+def test_index_settings_reject_invalid_values(conn, values):
+    with pytest.raises(sqlite3.IntegrityError, match="CHECK"):
+        conn.execute("INSERT INTO index_settings VALUES (?, ?, ?, ?, ?)", values)
+    assert conn.execute("SELECT COUNT(*) FROM index_settings").fetchone()[0] == 0
+
+
+@pytest.mark.parametrize("field_index", [1, 2, 3, 4])
+def test_index_settings_require_all_settings(conn, field_index):
+    values = [1, "BAAI/bge-m3", 1024, 400, 50]
+    values[field_index] = None
+    with pytest.raises(sqlite3.IntegrityError, match="NOT NULL"):
+        conn.execute("INSERT INTO index_settings VALUES (?, ?, ?, ?, ?)", values)
+
+
+def test_index_settings_reject_second_row(conn):
+    conn.execute("INSERT INTO index_settings VALUES (1, 'BAAI/bge-m3', 1024, 400, 50)")
+    with pytest.raises(sqlite3.IntegrityError):
+        conn.execute(
+            "INSERT INTO index_settings (model_name, dimensions, chunk_max_tokens, chunk_overlap_tokens) "
+            "VALUES ('other-model', 1024, 300, 25)"
+        )
+    rows = conn.execute("SELECT * FROM index_settings").fetchall()
+    assert [tuple(row) for row in rows] == [(1, "BAAI/bge-m3", 1024, 400, 50)]
+
+
+def test_index_settings_survive_reopen_and_schema_initialization(tmp_path):
+    db_path = tmp_path / "settings.db"
+    conn = connect(db_path)
+    try:
+        init_schema(conn)
+        with conn:
+            conn.execute("INSERT INTO index_settings VALUES (1, 'BAAI/bge-m3', 1024, 400, 50)")
+    finally:
+        conn.close()
+
+    conn = connect(db_path)
+    try:
+        init_schema(conn)
+        row = conn.execute("SELECT * FROM index_settings").fetchone()
+        assert tuple(row) == (1, "BAAI/bge-m3", 1024, 400, 50)
+    finally:
+        conn.close()
+
+
+def test_adding_settings_table_preserves_unlabelled_existing_index(conn):
+    # Simulate a database created before index settings were introduced.
+    conn.execute("DROP TABLE index_settings")
+    document_id = insert_document(conn, "legacy", status="indexed")
+    chunk_id = insert_chunk(conn, document_id, 0, "Existing passage", vector(1.0))
+    conn.commit()
+
+    init_schema(conn)
+
+    assert conn.execute("SELECT * FROM index_settings").fetchall() == []
+    assert conn.execute("SELECT status FROM documents WHERE id = ?", (document_id,)).fetchone()[0] == "indexed"
+    assert conn.execute("SELECT text FROM chunks WHERE id = ?", (chunk_id,)).fetchone()[0] == "Existing passage"
+    assert conn.execute("SELECT text FROM chunks_fts WHERE rowid = ?", (chunk_id,)).fetchone()[0] == "Existing passage"
+    assert conn.execute("SELECT embedding FROM chunks_vec WHERE rowid = ?", (chunk_id,)).fetchone()[0] == vector(1.0)
 
 
 # --- Constraints ---------------------------------------------------------------
