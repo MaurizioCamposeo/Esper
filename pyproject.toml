@@ -4,9 +4,13 @@ version = "0.1.0"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "numpy>=2.5.3",
+    "pillow>=11,<13",
+    "pymupdf>=1.24.11,<2",
+    "pyside6-essentials>=6.8,<7",
     "sentence-transformers>=6.1.0",
     "sqlite-vec>=0.1.9",
     "torch>=2.14.1",
+    "transformers>=5.19,<6",
 ]
 
 [[tool.uv.index]]
@@ -36,3 +40,6 @@ testpaths = ["tests"]
 
 [project.scripts]
 esper = "esper.cli:main"
+
+[project.gui-scripts]
+esper-desktop = "esper.desktop.app:main"

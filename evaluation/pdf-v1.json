@@ -1,0 +1,469 @@
+{
+  "schema_version": 1,
+  "name": "esper-pdf",
+  "version": "1.0",
+  "description": "Fixed fictional digital PDF development benchmark: ten three-page PDFs, page-level relevance and one image-only page in a mixed PDF. Simple layouts; not representative of arbitrary real-world PDFs. Frozen before the first PDF benchmark run.",
+  "documents": [
+    {
+      "key": "heating_invoice",
+      "format": "pdf",
+      "path": "assets/pdf-v1/heating_invoice.pdf",
+      "tags": [
+        "pdf",
+        "fictional"
+      ]
+    },
+    {
+      "key": "heating_service",
+      "format": "pdf",
+      "path": "assets/pdf-v1/heating_service.pdf",
+      "tags": [
+        "pdf",
+        "fictional"
+      ]
+    },
+    {
+      "key": "home_lease",
+      "format": "pdf",
+      "path": "assets/pdf-v1/home_lease.pdf",
+      "tags": [
+        "pdf",
+        "fictional"
+      ]
+    },
+    {
+      "key": "garage_lease",
+      "format": "pdf",
+      "path": "assets/pdf-v1/garage_lease.pdf",
+      "tags": [
+        "pdf",
+        "fictional"
+      ]
+    },
+    {
+      "key": "trip_train",
+      "format": "pdf",
+      "path": "assets/pdf-v1/trip_train.pdf",
+      "tags": [
+        "pdf",
+        "fictional"
+      ]
+    },
+    {
+      "key": "trip_flight",
+      "format": "pdf",
+      "path": "assets/pdf-v1/trip_flight.pdf",
+      "tags": [
+        "pdf",
+        "fictional"
+      ]
+    },
+    {
+      "key": "camera_manual",
+      "format": "pdf",
+      "path": "assets/pdf-v1/camera_manual.pdf",
+      "tags": [
+        "pdf",
+        "fictional"
+      ]
+    },
+    {
+      "key": "phone_cover",
+      "format": "pdf",
+      "path": "assets/pdf-v1/phone_cover.pdf",
+      "tags": [
+        "pdf",
+        "fictional"
+      ]
+    },
+    {
+      "key": "workshop_mixed",
+      "format": "pdf",
+      "path": "assets/pdf-v1/workshop_mixed.pdf",
+      "tags": [
+        "pdf",
+        "fictional"
+      ]
+    },
+    {
+      "key": "library_receipt",
+      "format": "pdf",
+      "path": "assets/pdf-v1/library_receipt.pdf",
+      "tags": [
+        "pdf",
+        "fictional"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "id": "heating_invoice-1",
+      "query": "Quanto ho pagato per sostituire la caldaia?",
+      "relevant_documents": [
+        "heating_invoice"
+      ],
+      "relevant_pages": {
+        "heating_invoice": [
+          2
+        ]
+      },
+      "slices": [
+        "pdf",
+        "digital_pdf"
+      ]
+    },
+    {
+      "id": "heating_invoice-2",
+      "query": "La garanzia dopo il montaggio del riscaldamento",
+      "relevant_documents": [
+        "heating_invoice"
+      ],
+      "relevant_pages": {
+        "heating_invoice": [
+          3
+        ]
+      },
+      "slices": [
+        "pdf",
+        "digital_pdf"
+      ]
+    },
+    {
+      "id": "heating_service-1",
+      "query": "La pulizia annuale del riscaldamento da 95 euro",
+      "relevant_documents": [
+        "heating_service"
+      ],
+      "relevant_pages": {
+        "heating_service": [
+          2
+        ]
+      },
+      "slices": [
+        "pdf",
+        "digital_pdf"
+      ]
+    },
+    {
+      "id": "heating_service-2",
+      "query": "Quando devo chiamare il tecnico per il prossimo controllo?",
+      "relevant_documents": [
+        "heating_service"
+      ],
+      "relevant_pages": {
+        "heating_service": [
+          3
+        ]
+      },
+      "slices": [
+        "pdf",
+        "digital_pdf"
+      ]
+    },
+    {
+      "id": "home_lease-1",
+      "query": "Il contratto con la cauzione di 1440 euro",
+      "relevant_documents": [
+        "home_lease"
+      ],
+      "relevant_pages": {
+        "home_lease": [
+          2
+        ]
+      },
+      "slices": [
+        "pdf",
+        "digital_pdf"
+      ]
+    },
+    {
+      "id": "home_lease-2",
+      "query": "Quanto prima devo avvisare se lascio casa?",
+      "relevant_documents": [
+        "home_lease"
+      ],
+      "relevant_pages": {
+        "home_lease": [
+          3
+        ]
+      },
+      "slices": [
+        "pdf",
+        "digital_pdf"
+      ]
+    },
+    {
+      "id": "garage_lease-1",
+      "query": "Quanto costa il box per parcheggiare?",
+      "relevant_documents": [
+        "garage_lease"
+      ],
+      "relevant_pages": {
+        "garage_lease": [
+          2
+        ]
+      },
+      "slices": [
+        "pdf",
+        "digital_pdf"
+      ]
+    },
+    {
+      "id": "garage_lease-2",
+      "query": "La scadenza del contratto del garage",
+      "relevant_documents": [
+        "garage_lease"
+      ],
+      "relevant_pages": {
+        "garage_lease": [
+          3
+        ]
+      },
+      "slices": [
+        "pdf",
+        "digital_pdf"
+      ]
+    },
+    {
+      "id": "trip_train-1",
+      "query": "Dove mi siedo sul treno per Torino?",
+      "relevant_documents": [
+        "trip_train"
+      ],
+      "relevant_pages": {
+        "trip_train": [
+          2
+        ]
+      },
+      "slices": [
+        "pdf",
+        "digital_pdf"
+      ]
+    },
+    {
+      "id": "trip_train-2",
+      "query": "TR-682",
+      "relevant_documents": [
+        "trip_train"
+      ],
+      "relevant_pages": {
+        "trip_train": [
+          2
+        ]
+      },
+      "slices": [
+        "pdf",
+        "digital_pdf"
+      ]
+    },
+    {
+      "id": "trip_flight-1",
+      "query": "How much cabin luggage can I take to Lisbon?",
+      "relevant_documents": [
+        "trip_flight"
+      ],
+      "relevant_pages": {
+        "trip_flight": [
+          2
+        ]
+      },
+      "slices": [
+        "pdf",
+        "digital_pdf"
+      ]
+    },
+    {
+      "id": "trip_flight-2",
+      "query": "Quanto prima apre il check in per il volo?",
+      "relevant_documents": [
+        "trip_flight"
+      ],
+      "relevant_pages": {
+        "trip_flight": [
+          3
+        ]
+      },
+      "slices": [
+        "pdf",
+        "digital_pdf"
+      ]
+    },
+    {
+      "id": "camera_manual-1",
+      "query": "Come copiare le foto della macchina sul computer?",
+      "relevant_documents": [
+        "camera_manual"
+      ],
+      "relevant_pages": {
+        "camera_manual": [
+          2
+        ]
+      },
+      "slices": [
+        "pdf",
+        "digital_pdf"
+      ]
+    },
+    {
+      "id": "camera_manual-2",
+      "query": "La fotocamera non parte, cosa controllo?",
+      "relevant_documents": [
+        "camera_manual"
+      ],
+      "relevant_pages": {
+        "camera_manual": [
+          3
+        ]
+      },
+      "slices": [
+        "pdf",
+        "digital_pdf"
+      ]
+    },
+    {
+      "id": "phone_cover-1",
+      "query": "La somma a mio carico se rompo lo schermo del telefono",
+      "relevant_documents": [
+        "phone_cover"
+      ],
+      "relevant_pages": {
+        "phone_cover": [
+          2
+        ]
+      },
+      "slices": [
+        "pdf",
+        "digital_pdf"
+      ]
+    },
+    {
+      "id": "phone_cover-2",
+      "query": "Entro quando devo segnalare il danno al cellulare?",
+      "relevant_documents": [
+        "phone_cover"
+      ],
+      "relevant_pages": {
+        "phone_cover": [
+          3
+        ]
+      },
+      "slices": [
+        "pdf",
+        "digital_pdf"
+      ]
+    },
+    {
+      "id": "workshop_mixed-1",
+      "query": "Ho perso la chiave del laboratorio: chi contatto?",
+      "relevant_documents": [
+        "workshop_mixed"
+      ],
+      "relevant_pages": {
+        "workshop_mixed": [
+          3
+        ]
+      },
+      "slices": [
+        "pdf",
+        "mixed_pdf"
+      ]
+    },
+    {
+      "id": "workshop_mixed-2",
+      "query": "Quando restituisco gli strumenti presi in prestito?",
+      "relevant_documents": [
+        "workshop_mixed"
+      ],
+      "relevant_pages": {
+        "workshop_mixed": [
+          3
+        ]
+      },
+      "slices": [
+        "pdf",
+        "mixed_pdf"
+      ]
+    },
+    {
+      "id": "library_receipt-1",
+      "query": "La scadenza del manuale di botanica preso in biblioteca",
+      "relevant_documents": [
+        "library_receipt"
+      ],
+      "relevant_pages": {
+        "library_receipt": [
+          2
+        ]
+      },
+      "slices": [
+        "pdf",
+        "digital_pdf"
+      ]
+    },
+    {
+      "id": "library_receipt-2",
+      "query": "Posso tenere il libro piu a lungo se nessuno lo ha prenotato?",
+      "relevant_documents": [
+        "library_receipt"
+      ],
+      "relevant_pages": {
+        "library_receipt": [
+          3
+        ]
+      },
+      "slices": [
+        "pdf",
+        "digital_pdf"
+      ]
+    },
+    {
+      "id": "pdf-both-heating",
+      "query": "I documenti sulle spese della caldaia",
+      "relevant_documents": [
+        "heating_invoice",
+        "heating_service"
+      ],
+      "relevant_pages": {
+        "heating_invoice": [
+          2
+        ],
+        "heating_service": [
+          2
+        ]
+      },
+      "slices": [
+        "pdf",
+        "multiple"
+      ]
+    },
+    {
+      "id": "pdf-filter",
+      "query": "La franchigia per il display rotto",
+      "tags": [
+        "pdf",
+        "fictional"
+      ],
+      "relevant_documents": [
+        "phone_cover"
+      ],
+      "relevant_pages": {
+        "phone_cover": [
+          2
+        ]
+      },
+      "slices": [
+        "pdf",
+        "tag_filter"
+      ]
+    },
+    {
+      "id": "pdf-unanswerable",
+      "query": "Il certificato di registrazione della barca a vela",
+      "relevant_documents": [],
+      "slices": [
+        "pdf",
+        "unanswerable"
+      ]
+    }
+  ]
+}

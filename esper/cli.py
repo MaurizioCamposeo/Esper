@@ -3,12 +3,15 @@ import argparse
 import sys
 from pathlib import Path
 import sqlite3
+import json
+from dataclasses import asdict
 
-from esper.config import DB_PATH
+from esper.config import DATA_DIR, DB_PATH
 from esper.db import connect, init_schema
 from esper.storage import import_file, get_document, delete_document
 from esper.tags import get_document_by_tag, get_document_tags, normalize_tag, add_tag, remove_tag
-from esper.indexing import index_queued
+from esper.indexing import index_queued, reindex_all
+from esper.search import SEARCH_MODES, search_documents, searchable_chunk_count, validate_search
 
 def build_parser() -> argparse.ArgumentParser:
     """Define the commands and their arguments."""
@@ -34,12 +37,30 @@ def build_parser() -> argparse.ArgumentParser:
     delete_cmd.add_argument("-y", "--yes", action="store_true", help="do not ask for confirmation")
 
     index_cmd = commands.add_parser("index", help="index queued documents")
+    commands.add_parser("reindex", help="rebuild all search indexes from archived originals")
+
+    search_cmd = commands.add_parser("search", help="search indexed documents by meaning and keywords")
+    search_cmd.add_argument("query", help="a natural-language description (quote multiple words)")
+    search_cmd.add_argument("--tag", dest="tags", action="append", default=[], help="require this tag (repeatable, AND)")
+    search_cmd.add_argument("--limit", type=int, default=5, help="maximum documents to return (default: 5)")
+    search_cmd.add_argument("--mode", choices=SEARCH_MODES, default="hybrid", help="retrieval method (default: hybrid)")
+    search_cmd.add_argument("--json", dest="json_output", action="store_true", help="print full structured results as JSON")
+
+    desktop_cmd = commands.add_parser("desktop", help="open the native desktop application")
+    desktop_cmd.add_argument("--data-dir", type=Path, default=DATA_DIR, help="archive folder (default: project data folder)")
 
     return parser
 
 def main(argv: list[str] | None = None) -> int:
     """Entry point of the `esper` command; return the process exit code."""
     args = build_parser().parse_args(argv)
+    if args.command == "desktop":
+        try:
+            from esper.desktop.app import run
+            return run(args.data_dir)
+        except (ImportError, OSError, sqlite3.DatabaseError) as exc:
+            print(f"error: could not start desktop application: {exc}", file=sys.stderr)
+            return 1
     conn = connect(DB_PATH)
     init_schema(conn)
 
@@ -56,9 +77,18 @@ def main(argv: list[str] | None = None) -> int:
             return cmd_delete(conn, args.document_ids, args.yes)
         if args.command == "index":
             return cmd_index(conn)
+        if args.command == "reindex":
+            return cmd_index(conn, rebuild=True)
+        if args.command == "search":
+            return cmd_search(conn, args.query, args.tags, args.limit, args.mode, args.json_output)
     except ValueError as ve:
         print(f'error: {ve}', file=sys.stderr)
         return 1
+    except KeyboardInterrupt:
+        print("interrupted", file=sys.stderr)
+        if args.command in ("index", "reindex"):
+            print("run 'esper index' to resume pending work, or 'esper reindex' to restart a rebuild", file=sys.stderr)
+        return 130
     finally:
         conn.close()
 
@@ -150,15 +180,17 @@ def cmd_delete(conn: sqlite3.Connection, document_ids: list[int], assume_yes: bo
         print(f"deleted document #{doc_id} [{doc['original_name']}]")
     return exit_code
 
-def cmd_index(conn: sqlite3.Connection) -> int:
-    """Index pending documents and report failures."""
+def cmd_index(conn: sqlite3.Connection, rebuild: bool = False) -> int:
+    """Index pending documents or rebuild the index and report failures."""
+    condition = "" if rebuild else "WHERE status IN ('queued', 'processing')"
     pending = conn.execute(
-        "SELECT id FROM documents  WHERE status IN ('queued', 'processing') ORDER BY id"
+        f"SELECT id FROM documents {condition} ORDER BY id"
     ).fetchall()
     if not pending:
-        print("no documents to index")
+        print("no documents to reindex" if rebuild else "no documents to index")
         return 0
-    print(f"indexing {len(pending)} documents...", flush=True)
+    action = "reindexing" if rebuild else "indexing"
+    print(f"{action} {len(pending)} documents...", flush=True)
 
     try:
         from esper.embedding import Embedder
@@ -167,7 +199,12 @@ def cmd_index(conn: sqlite3.Connection) -> int:
         print(f"error: could not load embedding model: {exc}", file=sys.stderr)
         return 1
 
-    indexed, failed = index_queued(conn, embedder)
+    try:
+        operation = reindex_all if rebuild else index_queued
+        indexed, failed = operation(conn, embedder)
+    except sqlite3.DatabaseError as exc:
+        print(f"error: could not update search index: {exc}", file=sys.stderr)
+        return 1
     print(f"indexed {indexed} documents")
     
     if failed:
@@ -175,5 +212,46 @@ def cmd_index(conn: sqlite3.Connection) -> int:
             doc = get_document(conn, row["id"])
             if doc["status"] == "error":
                 print(f"error: #{doc['id']} {doc['original_name']}: {doc['error']}", file=sys.stderr)
+    for row in pending:
+        doc = get_document(conn, row["id"])
+        if doc["status"] == "indexed" and doc["extraction_warning"]:
+            print(f"warning: #{doc['id']} {doc['original_name']}: {doc['extraction_warning']}", file=sys.stderr)
     
     return 1 if failed else 0
+
+
+def cmd_search(
+    conn: sqlite3.Connection, query: str, tags: list[str], limit: int, mode: str,
+    json_output: bool = False,
+) -> int:
+    """Load a model only when needed and display source passages for each document."""
+    validate_search(query, limit, mode)
+    embedder = None
+    if mode != "keyword" and searchable_chunk_count(conn, tags):
+        try:
+            from esper.embedding import Embedder
+            embedder = Embedder()
+        except Exception as exc:
+            print(f"error: could not load embedding model: {exc}", file=sys.stderr)
+            return 1
+    try:
+        hits = search_documents(conn, query, embedder, tags=tags, limit=limit, mode=mode)
+    except (sqlite3.DatabaseError, RuntimeError) as exc:
+        print(f"error: could not search index: {exc}", file=sys.stderr)
+        return 1
+    if json_output:
+        print(json.dumps([asdict(hit) for hit in hits], ensure_ascii=False))
+    elif not hits:
+        print("no results")
+    else:
+        for hit in hits:
+            tag_text = f"  [{', '.join(hit.tags)}]" if hit.tags else ""
+            print(f"#{hit.document_id:>4} {hit.name}  score={hit.score:.6f}{tag_text}")
+            for match in hit.matches:
+                passage = " ".join(match.text.split())
+                if len(passage) > 240:
+                    passage = passage[:239].rstrip() + "…"
+                location = f"page {match.page}, " if match.page is not None else ""
+                source = {"ocr": "OCR, ", "caption": "generated description, "}.get(match.source, "")
+                print(f"  [{match.via}, {location}{source}passage {match.position + 1}] {passage}")
+    return 0

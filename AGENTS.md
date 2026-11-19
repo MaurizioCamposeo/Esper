@@ -2,28 +2,27 @@
 
 ## Role and collaboration
 
-The user has explicitly asked the assistant to be a **guide**. Help the user
-understand and build the project themselves.
+On 2026-11-13 the user explicitly changed the collaboration mode: the assistant
+now handles application implementation, supporting tests, verification and
+documentation because the user has little time. Earlier guide-only checkpoints
+below are historical. Keep explaining the purpose of changes and report results.
 
 - Explain the purpose and reasoning behind the next change before presenting
   implementation details. Connect explanations to the actual project code.
 - Show how a new function fits into the whole pipeline, including which
   existing function produces its inputs and who will call it. The user has
   explicitly requested pipeline diagrams to connect helpers with chunking.
-- Work in small, understandable steps. Present the current step and let the user
-  implement it, ask questions, or share their result before advancing.
+- Work in understandable, verifiable increments. Implement authorized changes
+  directly without waiting for the user to write each function.
 - Offer focused examples or code snippets when useful; avoid delivering a whole
   feature at once unless the user asks for it.
 - Guidance can include exact code for the current function or step, with an
   explanation of how it works. It can also describe the approach and let the
   user work out the implementation. Adapt to the user's questions; do not turn
   the guide role into withholding useful code or giving only vague hints.
-- Read code, investigate problems, and review the user's work as needed. Do not
-  implement project code or rewrite the user's work unless explicitly asked.
-  When asked to implement a specific change, stay within that scope.
-- In the established workflow, the assistant handles supporting pytest tests
-  and verification; the user writes the application code. Keep tests focused
-  on the step being developed and use temporary data.
+- Read code, investigate problems, preserve existing user work, and implement
+  within the authorized scope. The assistant handles application code,
+  supporting pytest tests and verification. Use temporary data for tests.
 - The user handles commits and pushes.
 - Code comments and docstrings must be in English. Respond in the language the
   user is currently using; the earlier Claude conversations were in Italian.
@@ -43,24 +42,390 @@ natural-language descriptions through hybrid semantic and keyword search.
   verifiable working result before moving to the next.
 - Build and understand the core through command-line tools first. The API and
   interface integration come later.
-- Current tools: Python 3.12, uv, SQLite with FTS5 and sqlite-vec,
+- Current tools: Python 3.12, uv, Qt Widgets through PySide6 Essentials, PyMuPDF,
+  SQLite with FTS5 and sqlite-vec,
   sentence-transformers, and CPU-only PyTorch. The configured embedding model is
   `BAAI/bge-m3` with 1024 dimensions.
 - Original archived files and metadata are the primary data. Chunks and search
   indexes must be regenerable. Do not alter the user's real archive for tests.
 - Preserve existing user changes. Inspect the working tree before editing.
+- Esper is intended for public release. Favor dependencies and model runtimes
+  that can ship through a straightforward desktop install. Release setup must
+  install or provision the required local models, OCR engine and language data
+  so users can index and search without developer commands or manual model
+  downloads. Consider install size and future updates when choosing models and
+  dependencies.
 
 ## Starting a new chat
 
 1. Read this file and inspect `git status`, recent commits, and the code relevant
    to the user's request.
-2. Use `docs/ARCHITETTURA.tex` for the roadmap, `USAGE.md` for documented CLI
-   behavior, and `docs/API_CONTRACT.md` for the future backend interface.
+2. Use `docs/ARCHITETTURA.tex` for the roadmap, `USAGE.md` for desktop/CLI
+   behavior, and `DESIGN.md` for native interface design. The former HTTP
+   contract and web frontend were removed; the desktop calls Python directly.
    Documentation may lag behind implementation; verify against the code.
-3. Briefly establish the current step and resume guiding from there. Do not
-   interpret an unfinished checkpoint as permission to implement it autonomously.
+3. Briefly establish the current step and resume the agreed workflow from there.
+   Use the user's current authorization to determine implementation scope.
 
-## Active backend work — 2026-10-29
+## Model delegation — 2026-11-19
+
+- Use Terra 6.1 for visual work such as fixture selection, image inspection,
+  screenshot review, and reproducing failures with visual inputs.
+- Keep routine implementation and test tasks with the primary agent. The user
+  removed Luna from the delegation workflow.
+- Give each delegated task a specific deliverable and separate file ownership
+  where it involves edits. The primary agent owns integration, migrations and
+  verification through the normal entry points.
+- Get the user's approval before any use of Astra 6.2, including a model switch
+  or delegation. Explain which decision or blocker would benefit from it.
+
+## Native search controls and spatial archive — 2026-11-19
+
+- The desktop uses three always-visible choices for keyword, semantic and hybrid
+  search. The compact home keeps the optical preview and recent files visible.
+  Map selection, keyboard controls and opening a file use the normal native reader.
+- Mappa 3D aggregates existing passage embeddings to one unit vector per file.
+  PCA supplies three display coordinates. Each file nominates up to four neighbors
+  below cosine distance 0.30. SQLite caches points and edges by archive revision
+  and layout version. Opening an older index builds the map without re-embedding.
+  Files without a usable vector remain available in the file selector.
+- The map refits after indexed membership or vectors change. Positions can move.
+  Projection distorts distances, and exact link calculation is quadratic on a cache
+  miss. The threshold is a display choice with no effect on search relevance.
+- Verified offline on 23 fictional and fixture files using bge-m3, including PDF
+  and JPEG. All 23 had coordinates, four links passed the default rule, and a
+  reopened archive returned identical geometry. The test suite passed 447 tests.
+  Terra checked home, results and the map at 1040×650 and 1440×900 in both themes.
+
+## Detailed descriptions and OCR together — 2026-11-19
+
+- The user approved running OCR and visual description on every standalone JPEG
+  and PNG. This supersedes the earlier fallback-only milestone. The captioner
+  now uses the native Transformers Florence-2-base-ft model with its paragraph
+  caption task on CPU. The pinned weights are provisioned in the project runtime.
+- Every usable transcription and description has its own labelled passages in
+  the existing bge-m3 and FTS indexes. Partial engine failures retain searchable
+  output with a warning and a retry action. Schema version 1 queues previously
+  indexed JPEG/PNG files once to regenerate their passages.
+- Terra reviewed the Qt layout at 1040×650. The activity strip displays model
+  loading, the active filename and pending count independently of result filters.
+  Cards show the specific extraction warning. Background polling preserves
+  existing cards while the document snapshot is unchanged.
+- The full suite passed with 440 tests. Offline checks used a receipt and a
+  textless photo, including exact-word and Italian semantic retrieval. These
+  examples establish functionality; broader search quality remains unmeasured.
+- Refreshed all six existing images in the user's designated test archive.
+  All six have captions, three also have usable OCR, and none had a warning.
+
+## JPEG and PNG search — 2026-11-19
+
+- Started phase 6 with standalone JPEG/PNG. `extract_document` runs Tesseract
+  with Italian and English data in sparse-text mode, and uses word confidence
+  to choose between an OCR transcription and an offline BLIP description.
+  OCR engine failures surface as indexing errors. Corrupt images fail before OCR.
+- BLIP is pinned to Salesforce revision
+  `82a37760796d32b1411fe092ab5d4e227313294b`, loaded lazily on CPU from the
+  Hugging Face cache. Descriptions are in English. A single branch supplies
+  text to the existing chunking, FTS and bge-m3 indexing path. No embedding
+  model or index dimensions changed.
+- Chunks persist their source (digital text, OCR or caption). Old rows default
+  to digital text. CLI JSON exposes it, and desktop cards and the reader label
+  OCR and generated matches. Older failed JPEG/PNG imports can be retried in
+  the reader once prerequisites are installed. Archived originals are preserved.
+- Terra 6.1 prepared five fixtures and found that the local GLM OCR model echoed
+  its prompt on the textless sample, and that Tesseract gave a false two-letter
+  token slightly above 70 confidence on the watermarked sample. The OCR
+  heuristic now rejects isolated short alphabetic tokens and keeps clear
+  identifiers. It can still miss short words or fine print.
+- Offline smoke test with actual Tesseract 5.5.3, BLIP and bge-m3 indexed five
+  images in a temporary archive. Keyword search found the receipt and
+  `AB-7429`; an Italian semantic query ranked the textless tomato photo first.
+  The tiny watermark was missed by OCR, which triggered the description path.
+  Both OCR languages and the BLIP cache were staged in `/tmp` for verification.
+  This was a smoke test on a few fixtures. The real archive was not used.
+- Full suite: 432 passing tests, including OCR routing and failures, caption
+  provenance, compatibility with existing chunks, and desktop retry.
+- Updated README, USAGE, DESIGN and architecture source/PDF. Scanned PDF OCR,
+  generating both OCR and captions for the same image, and direct visual
+  embeddings remain future work. The user explicitly deferred generating both.
+
+## Image runtime and normal launch — 2026-11-19
+
+- Two fresh imports showed that the temporary launcher was insufficient for
+  routine testing. The user approved Astra 6.2, which confirmed that the
+  reported error came from the executable lookup and that the normal
+  environment lacked both Tesseract and a cached BLIP model.
+- This checkout now has an ignored `.esper-runtime/` directory on disk.
+  Esper runs its Tesseract binary by absolute path with explicit Italian and
+  English language files, and loads the pinned BLIP snapshot from disk.
+  System Tesseract and the usual BLIP cache remain valid for other checkouts.
+  The existing bge-m3 cache is used through its normal location.
+- Verified fresh offscreen desktop imports with no Tesseract on `PATH` and
+  the temporary cache and language environment cleared. The real OCR and
+  caption paths both worked, including an Italian search. The two PNGs that
+  had failed in the user's temporary test archive were retried successfully.
+  The full suite passed with 433 tests.
+- Launch the same test archive with
+  `uv run esper desktop --data-dir /tmp/esper-image-test`.
+  The runtime staging is specific to this checkout and Fedora machine.
+
+## Collaboration and delivery update — 2026-11-13
+
+- The user delegated coding and associated development work to the assistant,
+  superseding the earlier guide-only workflow. The user then explicitly
+  authorized proceeding with the phase 2 completion milestone.
+- Phase 2, step 7 and the oversized-word fix are complete; see verification below.
+  The starting HEAD was `4cc45d6`; the assistant has not committed or pushed.
+- Keep bge-m3 active while designing reusable model settings/loading boundaries
+  for future EmbeddingGemma 2 text support. Do not switch models now.
+- The user subsequently selected native desktop delivery and removal of the web
+  interface. Qt Widgets is now implemented; see the native desktop checkpoint.
+  Keep the core independent of widgets and retain the working CLI.
+
+## Phase 2 completion — 2026-11-13
+
+- Implemented saving/validating index settings and compatibility barriers in
+  `esper/index_settings.py`, integrated into both direct document indexing and
+  queued processing. Metadata records the loaded model name, actual output
+  dimensions, maximum chunk tokens, overlap and chunker version.
+- Unknown settings on an existing index, changed settings and actual vector
+  table width mismatches fail before document processing/state recovery. Only
+  an unused index can initialize its metadata automatically. Metadata is checked
+  again under the write lock before generated vectors are stored.
+- Added `chunker_version` schema migration. Pre-existing settings rows receive
+  legacy version 1, so corrected version 2 requires an explicit full rebuild.
+  The metadata table remains a singleton describing the current text index.
+- Added `reindex_all` and `esper reindex`. The CLI loads the model first. A reset
+  transaction clears chunks/FTS, recreates the vector table using the loaded
+  model's dimensions, saves settings and queues all documents. Originals,
+  document metadata and tags are preserved. Reset failures roll back the old
+  index; after a successful reset the old index is replaced, not retained as a
+  fallback. The rebuild then commits documents individually through the queue.
+- Interrupted rebuilds resume with `esper index`; completed documents are
+  skipped. Repeating `esper reindex` restarts every document, including errors.
+  Ctrl+C returns 130 with recovery guidance. Empty index/reindex commands do not
+  load the model; model and reset errors have readable CLI messages.
+- Fixed oversized words with measured Unicode-character splitting. Invalid
+  budgets or a single character exceeding the budget raise an explicit error.
+  No tokenizer-specific decoding or truncation is used.
+- Full suite: 279 passing tests, including settings migration, persistence,
+  compatibility rejection, index replacement across 1024/768 dimensions with
+  lightweight embedders, reset rollback, preservation of primary data, CLI
+  failures, Ctrl+C and resume. Tests use temporary databases/archives.
+- Offline real bge-m3 check passed: `contratto` repeated 500 times has 999 tokens
+  and now produces four 249-token chunks with no character loss. A temporary CLI
+  workflow imported two documents, indexed them, rejected unknown metadata,
+  rebuilt and verified six aligned chunks/FTS entries/normalized float32 vectors
+  of 1024 dimensions. The real project archive/database was not used.
+- Updated USAGE.md and docs/ARCHITETTURA.tex; rebuilt docs/ARCHITETTURA.pdf.
+  docs/ remains ignored by Git. Frontend and dependencies are unchanged.
+- Future model-specific loading/prompts (including EmbeddingGemma 2) still need
+  their own integration; dimension-changing rebuild support is now verified.
+  Phase 3 implementation followed below. Desktop toolkit and transport remain
+  undecided; no desktop or HTTP runtime has been introduced.
+
+## Phase 3 search implementation — 2026-11-13
+
+- The user explicitly authorized implementing actual retrieval. Added
+  `esper/search.py`: exact cosine neighbors via sqlite-vec scalar distance,
+  FTS5/BM25 keyword retrieval, reciprocal rank fusion (constant 60), document
+  grouping and up to three source passages. Documents are ranked by the best
+  passage, without summing votes from their other chunks.
+- Shared SQL prefilters require status `indexed` and every normalized requested
+  tag before ranking limits. The candidate window starts normally at 50 per
+  branch and expands if long documents prevent enough distinct document hits.
+  Scalar vector ranking avoids vec0 KNN's 4096-neighbor cap and has stable ties.
+- Natural-language keywords become quoted literal Unicode words joined by OR;
+  raw FTS syntax is not exposed. Keyword-only search does not load a model or
+  require embedding settings. There is no Italian stemming, automatic prefix
+  expansion or calibrated semantic relevance threshold.
+- Added `Embedder.embed_query`, separated from document embedding for future
+  model instructions. bge-m3 still uses its existing normalized encoding. Query
+  context limits include special tokens and reject oversize rather than truncate.
+  EmbeddingGemma 2 loading/prompts remain future work; no model switch occurred.
+- Semantic/hybrid search uses read-only `check_index_settings` before inference
+  and again inside a consistent read snapshot shared by both branches and source
+  passage reads. Query inference runs before that snapshot. Search does not
+  initialize metadata, mutate indexes, or commit a caller's transaction.
+- Added `esper search "description"` with `--tag` (repeatable AND), `--limit`
+  (default 5), `--mode hybrid|semantic|keyword` and `--json`. Text output includes
+  IDs, names, scores, tags and shortened passages; JSON has full text and internal
+  snake_case metadata, not the future HTTP contract. Scores are ranks, not
+  relevance probabilities. No results is exit 0; errors return 1; Ctrl+C is 130.
+  Empty eligible sets skip model loading, as does keyword-only search.
+- Full suite: 362 passing tests. Search tests cover literal input, BM25/cosine
+  order, RRF, document grouping, AND prefilters, status exclusion, 768-dimensional
+  retrieval, read snapshots while another connection deletes a document,
+  model compatibility, invalid vectors, CLI failures and query context limits.
+- Added `esper/evaluation.py`, `scripts/evaluate_search.py` and a fixed fictional
+  Italian corpus in `evaluation/demo.json` (20 documents, 40 labelled queries).
+  The tool builds only temporary archives, reuses one loaded model, computes
+  recall@1/5/10 and supports hybrid/semantic/keyword comparison and JSON details.
+- Offline bge-m3 evaluation passed: hybrid and semantic recall@1=0.9875,
+  recall@5=1.0 and recall@10=1.0; keyword recall@1=0.9375, recall@5=0.975 and
+  recall@10=1.0. One query has two relevant documents, limiting recall@1 to 0.5
+  on that query. This small labelled development fixture is not an independent
+  benchmark, large-archive latency test or quality guarantee on personal data.
+  Representative real-archive relevance evaluation remains outstanding.
+- A separate offline real-model CLI check passed import, indexing, hybrid
+  retrieval of a boiler receipt, a semantic paraphrase with tag filtering,
+  numeric keyword lookup and full JSON output in a temporary three-document
+  archive. Project archive/database and frontend were untouched by verification.
+- Updated USAGE.md, evaluation/README.md and architecture source/PDF. The latter
+  remain ignored by Git. No dependencies, desktop shell or web server were added.
+- At this checkpoint search was available through CLI/core only. Native desktop
+  integration followed below and supersedes the earlier Svelte prototype.
+  The user still handles commits and pushes.
+
+## Native desktop replacement — 2026-11-13
+
+- The user explicitly changed the UI goal: replicate the approved interface as
+  a native desktop app and completely remove the web interface. This supersedes
+  the intermediate request to connect the existing Svelte UI over HTTP.
+- Implemented Python/Qt Widgets in `esper/desktop/`, using PySide6 Essentials
+  (installed/locked version 6.12.0). No Qt WebEngine, browser, HTTP server, Rust
+  shell or JavaScript runtime is used. FastAPI dependencies were not added.
+- Launch with `uv run esper desktop`; `--data-dir PATH` selects a separate
+  archive. `esper-desktop` is also registered as a GUI entry point. Default data
+  remain the existing project `data/` archive. Qt/model imports stay lazy for
+  unrelated CLI commands, and `desktop --help` does not open the database.
+- Native service operations reuse storage, tags, index settings, chunking and
+  hybrid search. The service is Qt-independent. One worker QThread serializes
+  import, indexing, search and mutations, with one SQLite connection per
+  operation and one lazily loaded/reused embedding model.
+- Reproduced the Italian monochrome optical console: prominent natural-language
+  query, real archive recall frames, angular framing, grid/list cards, sorting,
+  type/tag filters, semantic/hybrid/keyword modes and readable source passages.
+  Theme, motion, view, sort, mode and geometry persist in desktop.ini per archive.
+  Qt's reduced-motion hint is honored when available, including changes at runtime.
+- Native picker/drop import indexes files in the background; pending/interrupted
+  work resumes at startup. Progress displays actual statuses, without fabricated
+  percentages. Search generations discard outdated queued queries and results;
+  active queries refresh when newly imported documents finish indexing.
+- Native document dialog previews original TXT/Markdown, avoiding duplicated
+  overlap text; large previews stop at 2 MB without corrupting UTF-8 boundaries.
+  Source passages, metadata, atomic tag replacement, original opening, retry and
+  confirmed deletion are wired to the real archive. Images preview natively;
+  PDFs open in the system reader. PDF extraction/OCR/image retrieval remain later.
+- Full rebuilding requires explicit confirmation in the UI. Unknown/incompatible
+  metadata produces an Italian rebuild message. Closing requests cooperative
+  stop between documents, lets the active operation finish and preserves the
+  remaining queue. Added optional progress/stop callbacks to core queue helpers.
+- Removed the complete frontend/ directory, including Svelte/TypeScript, Vite,
+  npm manifests/lockfile, mock API/data, generated demo photo and build artifacts.
+  Removed docs/API_CONTRACT.md. Root DESIGN.md records the native design. Earlier
+  dated web-prototype paths below are historical, not current files.
+- Full suite: 386 tests pass. Automated verification uses Qt's offscreen platform and only temporary archive
+  folders/preferences. The suite covers service operations, real signal/event
+  flow, import/search, tag editing/filtering, reader, themes, image preview,
+  confirmed deletion, stale results, rebuild recovery and closing during blocked
+  inference with an unfinished document left queued. CLI tests cover lazy Qt
+  imports and selecting a separate archive without opening the default database.
+- Real bge-m3 verification used Qt's normal event loop and a temporary archive of
+  eight fictional documents. Import/indexing, correct hybrid retrieval of the
+  boiler document, source preview, themes and clean worker shutdown passed.
+  Screenshots are in /tmp/esper-native-{empty,home,search,reader,light}.png and the
+  temporary review harness is /tmp/esper_native_review.py. The user's real archive
+  was not used for tests. No demo documents are seeded into the native app.
+- Updated README, USAGE, DESIGN and architecture source/PDF. Source launch is
+  supported; standalone installers and release packaging remain pending phase 9.
+  bge-m3 remains active. Future EmbeddingGemma 2 adapters are still separate work.
+  Next planned format milestone is PDF extraction; representative real-archive
+  retrieval evaluation also remains useful. Do not claim either is complete.
+
+## Versioned benchmarks and digital PDFs — 2026-11-14
+
+- The user authorized a reproducible bge-m3 benchmark, reusable for future Gemma
+  comparisons and file formats, followed by PDF support. Both are implemented.
+  bge-m3 remains active; no Gemma loading/prompt adapter or OCR was added.
+- Added `esper/benchmark.py`, `scripts/benchmark.py`, fixed manifests
+  `evaluation/benchmark-v1.json` (45 documents, 85 queries) and
+  `evaluation/pdf-v1.json` (10 real fictional PDFs, 23 queries), plus PDF assets.
+  The earlier `demo.json`/evaluation runner are retained. Manifests support
+  inline text or relative asset paths, stable IDs, binary relevance, tags,
+  slices and optional one-based page labels. Asset bytes and labels contribute
+  to a fingerprint; duplicate content, invalid labels and changed assets fail.
+- Every run creates a temporary archive/index at the actual model dimension.
+  A callable model factory is the future adapter boundary; CLI stays bge-m3.
+  Added optional embedding revision loading; benchmark pins the cached model
+  snapshot when available (recorded baseline revision:
+  `5617a9f61b028005a4858fdac845db406aefb181`).
+- Reports include recall/hit/nDCG@1/5/10, MRR@10, per-query rankings and timings,
+  slices, separate unanswerable empty-result rates, PDF page hit and first-page
+  accuracy. Runtime includes model load, import/indexing, warm search median/p95,
+  SQLite size and process lifetime peak RSS. CPU/package/thread/source metadata
+  and protocol are recorded. Comparisons reject different tasks/protocols and
+  flag changed environments/configurations. Output files are never overwritten.
+- Offline CPU baselines are saved under `evaluation/results/`; prefer pinned
+  `bge-m3-text-v1-final.json` and `bge-m3-pdf-v1-final.json`. Text recall@5:
+  semantic 0.9939, hybrid 0.9390, keyword 0.8902. Median text search: approximately
+  132/135/11 ms respectively on this machine. Text build: 50 chunks in 19.32 s,
+  model load 7.00 s, process peak RSS about 2.08 GiB. Before/after PDF support,
+  all text ranking metrics were unchanged. These are small synthetic development
+  fixtures, not independent benchmarks or personal-archive quality guarantees.
+- PDF recall@5: semantic and hybrid 1.0, keyword 0.9091. First expected page in
+  the top document's first passage: semantic 22/22, hybrid 18/22, keyword 13/22.
+  Semantic/hybrid have no calibrated rejection threshold; unfiltered queries
+  without a relevant document still return neighbors. No ranking tuning or
+  default search-mode change was made in response to benchmark results.
+- Installed/locked PyMuPDF 1.28.2. `extract_document` returns source sections;
+  `index_document` chunks each PDF page independently (overlap never crosses a
+  page), then `write_chunks` stores page metadata atomically with all indexes.
+  `extract_text` remains available. TXT/Markdown chunk behavior is unchanged.
+  Repeated complete margin blocks are removed only within outer 50 points on
+  at least three and half the pages. MuPDF dehyphenation is supplemented with
+  lowercase line-ending fragment joining; genuine split compounds can still
+  lose hyphens. Complex layout/table extraction remains limited.
+- Idempotent nullable migrations add `chunks.page`, `documents.page_count` and
+  `extraction_warning` without relabelling/rebuilding existing text vectors.
+  PDFs with no text, password protection or corruption have explicit errors;
+  mixed/blank pages generate partial-search warnings without changing physical
+  page numbers. Warnings appear in desktop cards/reader and CLI indexing stderr.
+  Previously errored PDFs require retry from the reader or explicit reindexing.
+- Search passage objects and CLI JSON/text include PDF page references. Native
+  PDF preview renders bounded images in the archive worker, fits the viewport
+  width, opens at the best matching page and supports page selection/navigation.
+  Generation IDs discard stale preview responses. Opening the original in a
+  system reader remains available. No web runtime was introduced.
+- Full suite: 416 passing tests using temporary archives, covering benchmark
+  metrics/fingerprints/isolation/dimension changes, migrations, page boundaries,
+  margin cleanup/dehyphenation, blank/encrypted/corrupt PDFs, rollback, CLI page
+  output/warnings, native matching-page preview/navigation and stale responses.
+  A separate offline real bge-m3 native event-loop check passed import/indexing,
+  paraphrase search and preview on page 2. Harness and captures:
+  `/tmp/esper_pdf_real_review.py`, `/tmp/esper-pdf-{reader,results}.png`.
+- Updated README, USAGE, DESIGN, evaluation guides/results summary and architecture
+  source/PDF. `docs/` remains ignored. No real archive files/database were used or
+  modified by this milestone. The user still handles commits and pushes.
+- Next planned format work is OCR/scanned documents and images (phase 6).
+  Representative real-world retrieval evaluation and investigating hybrid
+  regressions remain useful follow-ups; neither is claimed complete.
+
+## Archive reset and desktop review — 2026-11-14
+
+- At the user's explicit request, cleared the default `data/esper.db` and
+  `data/files/` for manual import testing. The two previously archived documents
+  and database were backed up to `/tmp/esper-before-reset-20261114-155426` first.
+  Recreated the empty schema and verified zero documents, tags, chunks, FTS rows,
+  vectors and index settings. Desktop preferences and external source files were
+  preserved. This was requested maintenance, not use of real data for tests.
+- Clarified that current import copies files and deduplicates by content hash;
+  it does not retain only source paths. Asked whether the user wants path-only
+  storage; no answer received during this change. Storage behavior is unchanged;
+  do not record path-only support or a settled preference as implemented.
+- Reviewed native Qt layouts at 1040×650 with temporary documents in dark/light
+  themes. Fixed horizontal tag overflow, clipped filenames in cards and reader,
+  reduced sidebar spacing to leave more room for tags, and removed mismatched
+  hero child backgrounds. Elided text remains available via tooltips and
+  accessible names; tag actions retain the full underlying tag.
+- Empty filtered views now explain the lack of matching documents. Tag/retry/
+  delete failures remain visible inside an open reader instead of appearing
+  only behind it. Tag editing starts at the beginning of the field.
+- Full suite: 389 passing tests, including long names/tags in the small window,
+  filtered empty states and failed tag saves preserving input. All verification
+  used temporary archives. Review captures are `/tmp/esper-audit-*-after.png`.
+
+## Backend checkpoint — 2026-10-29
 
 - The user explicitly resumed phase 2, step 7: full reindexing and tracking
   the settings used to build the index. Continue in the guide role; the user
@@ -88,7 +453,10 @@ natural-language descriptions through hybrid semantic and keyword search.
   Existing indexes without metadata must not be labelled automatically from
   the current configuration.
 
-## Interface redesign checkpoint — 2026-10-27
+## Historical web interface redesign — 2026-10-27 (removed 2026-11-13)
+
+The following records the removed prototype and its design feedback. The native
+desktop checkpoint above describes the current implementation.
 
 - The user explicitly deferred backend phase 2, step 7 to focus on a complete
   redesign of the existing Svelte frontend. Do not resume step 7 automatically.

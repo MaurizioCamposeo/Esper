@@ -7,6 +7,9 @@ HEADING = re.compile(r"#{1,6}\s") # from 1 to 6 # followed by a space, in order 
 PARAGRAPH_BREAK = re.compile(r"\n\s*\n") # empty line
 SENTENCE_END = re.compile(r"(?<=[.!?])\s+") # point that follows one of the character i the []
 
+# Increment when chunk boundaries change so existing indexes require a rebuild.
+CHUNKER_VERSION = 2
+
 def has_body(lines: list[str]) -> bool:
     """Return True if the lines contain text other than headings and blank lines."""
     return any(line.strip() and not HEADING.match(line) for line in lines)
@@ -31,15 +34,40 @@ def split_sections(text: str) -> list[str]:
 
 def split_words(text: str, max_tokens: int, count_tokens: Callable[[str], int]) -> list[str]:
     """Split text into consecutive groups of words, each within max_tokens."""
+    if max_tokens <= 0:
+        raise ValueError("max_tokens must be positive")
     pieces: list[str] = []
     current: list[str] = []
     for word in text.split():
+        if count_tokens(word) > max_tokens:
+            if current:
+                pieces.append(" ".join(current))
+                current = []
+            pieces.extend(split_long_word(word, max_tokens, count_tokens))
+            continue
         if current and count_tokens(" ".join(current + [word])) > max_tokens:
             pieces.append(" ".join(current))
             current = []
         current.append(word)
     if current:
         pieces.append(" ".join(current))
+    return pieces
+
+
+def split_long_word(word: str, max_tokens: int, count_tokens: Callable[[str], int]) -> list[str]:
+    """Split an oversized word at character boundaries without discarding text."""
+    pieces: list[str] = []
+    pending = [word]
+    while pending:
+        part = pending.pop()
+        if count_tokens(part) <= max_tokens:
+            pieces.append(part)
+        elif len(part) <= 1:
+            raise ValueError("A single character exceeds the chunk token budget")
+        else:
+            # Measure every piece: token counts need not grow monotonically.
+            middle = len(part) // 2
+            pending.extend((part[middle:], part[:middle]))
     return pieces
 
 def split_units(section: str, max_tokens: int, count_tokens: Callable[[str], int]) -> list[str]:
@@ -87,6 +115,10 @@ def pack_units(units: list[str], max_tokens: int, overlap_tokens: int, count_tok
 
 def chunk_text(text: str, max_tokens: int, overlap_tokens: int, count_tokens: Callable[[str], int]) -> list[str]:
     """Split text into chunks: sections, then units, then packed chunks with overlap."""
+    if max_tokens <= 0:
+        raise ValueError("max_tokens must be positive")
+    if not 0 <= overlap_tokens < max_tokens:
+        raise ValueError("overlap_tokens must be nonnegative and smaller than max_tokens")
     chunks: list[str] = []
     for section in split_sections(text):
         units = split_units(section, max_tokens, count_tokens)

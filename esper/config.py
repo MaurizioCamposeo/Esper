@@ -2,6 +2,7 @@
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+RUNTIME_DIR = PROJECT_ROOT / ".esper-runtime"
 
 DATA_DIR = PROJECT_ROOT / "data"
 

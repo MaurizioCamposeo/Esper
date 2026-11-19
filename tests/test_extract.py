@@ -96,7 +96,7 @@ def test_extract_windows_file_end_to_end(write_bytes):
     assert extract_text(path, "text/plain") == "Caffè\n2 €"
 
 
-@pytest.mark.parametrize("mime_type", ["application/pdf", "image/png", "application/octet-stream"])
+@pytest.mark.parametrize("mime_type", ["image/bmp", "application/octet-stream"])
 def test_extract_unsupported_type(write_bytes, mime_type):
     path = write_bytes("file.bin", b"\x00\x01")
     with pytest.raises(UnsupportedFormatError, match=mime_type):

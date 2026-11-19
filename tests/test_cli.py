@@ -3,6 +3,7 @@
 from functools import partial
 import subprocess
 import sys
+import sqlite3
 from types import ModuleType
 
 import numpy as np
@@ -11,7 +12,7 @@ import pytest
 from esper import cli
 from esper.config import EMBEDDING_DIMENSIONS
 from esper.db import connect
-from esper.indexing import index_queued
+from esper.indexing import index_queued, reindex_all
 from esper.storage import delete_document, import_file
 
 
@@ -24,6 +25,7 @@ def db_path(tmp_path, files_dir, monkeypatch):
     monkeypatch.setattr(cli, "import_file", partial(import_file, files_dir=files_dir))
     monkeypatch.setattr(cli, "delete_document", partial(delete_document, files_dir=files_dir))
     monkeypatch.setattr(cli, "index_queued", partial(index_queued, files_dir=files_dir))
+    monkeypatch.setattr(cli, "reindex_all", partial(reindex_all, files_dir=files_dir))
     return db_path
 
 
@@ -57,6 +59,25 @@ def count_documents(db_path):
         return conn.execute("SELECT COUNT(*) FROM documents").fetchone()[0]
     finally:
         conn.close()
+
+
+def test_pdf_cli_index_warning_and_search_page_json(run, tmp_path, embedding_module):
+    import json
+    import pymupdf
+
+    path = tmp_path / "mixed.pdf"
+    with pymupdf.open() as pdf:
+        pdf.new_page()
+        pdf.new_page().insert_text((70, 110), "caldaia 2400 euro")
+        pdf.save(path)
+    assert run("import", str(path))[0] == 0
+    code, out, err = run("index")
+    assert code == 0 and "indexed 1 documents" in out
+    assert "warning:" in err and "Pagine senza testo estraibile: 1" in err
+    code, out, err = run("search", "caldaia", "--mode", "keyword")
+    assert code == 0 and "page 2" in out
+    code, out, err = run("search", "caldaia", "--mode", "keyword", "--json")
+    assert code == 0 and json.loads(out)[0]["matches"][0]["page"] == 2
 
 
 # --- Argument parsing --------------------------------------------------------------
@@ -255,7 +276,10 @@ def embedding_module(monkeypatch):
 
     class FakeEmbedder:
         def __init__(self):
+            self.model_name = "test/model"
+            self.dimensions = EMBEDDING_DIMENSIONS
             self.calls = []
+            self.queries = []
             module.instances.append(self)
 
         def count_tokens(self, text):
@@ -263,9 +287,13 @@ def embedding_module(monkeypatch):
 
         def embed(self, texts):
             self.calls.append(list(texts))
-            vectors = np.zeros((len(texts), EMBEDDING_DIMENSIONS), dtype=np.float32)
+            vectors = np.zeros((len(texts), self.dimensions), dtype=np.float32)
             vectors[:, 0] = 1.0
             return vectors
+
+        def embed_query(self, query):
+            self.queries.append(query)
+            return self.embed([query])[0]
 
     module.Embedder = FakeEmbedder
     monkeypatch.setitem(sys.modules, "esper.embedding", module)
@@ -342,7 +370,7 @@ def test_index_reports_only_new_failures_and_continues_with_other_documents(
 ):
     run(
         "import",
-        str(make_file("bad.pdf", "Unsupported document.")),
+        str(make_file("bad.bin", "Unsupported document.")),
         str(make_file("good.txt", "Good document.")),
         str(make_file("old.txt", "Previous failure.")),
     )
@@ -356,11 +384,11 @@ def test_index_reports_only_new_failures_and_continues_with_other_documents(
     assert run("index") == (
         1,
         "indexing 2 documents...\nindexed 1 documents\n",
-        "error: #1 bad.pdf: UnsupportedFormatError: application/pdf\n",
+        "error: #1 bad.bin: UnsupportedFormatError: application/octet-stream\n",
     )
 
     assert read_document_states(db_path) == [
-        (1, "error", "UnsupportedFormatError: application/pdf"),
+        (1, "error", "UnsupportedFormatError: application/octet-stream"),
         (2, "indexed", None),
         (3, "error", "Old failure"),
     ]
@@ -392,12 +420,12 @@ def test_index_reports_model_loading_failure_without_changing_document_states(
 
 
 def test_index_returns_failure_when_all_documents_are_unsupported(run, make_file, embedding_module):
-    run("import", str(make_file("bad.pdf", "Unsupported PDF.")))
+    run("import", str(make_file("bad.bin", "Unsupported PDF.")))
 
     assert run("index") == (
         1,
         "indexing 1 documents...\nindexed 0 documents\n",
-        "error: #1 bad.pdf: UnsupportedFormatError: application/pdf\n",
+        "error: #1 bad.bin: UnsupportedFormatError: application/octet-stream\n",
     )
     assert len(embedding_module.instances) == 1
     assert embedding_module.instances[0].calls == []
@@ -412,8 +440,12 @@ from esper import cli
 cli.DB_PATH = Path(sys.argv[1])
 assert cli.main(['list']) == 0
 assert cli.main(['index']) == 0
+assert cli.main(['reindex']) == 0
+assert cli.main(['search', 'hello']) == 0
+assert cli.main(['search', 'hello', '--mode', 'keyword']) == 0
 assert 'esper.embedding' not in sys.modules
 assert 'torch' not in sys.modules
+assert 'PySide6' not in sys.modules
 """
     result = subprocess.run(
         [sys.executable, "-c", script, str(tmp_path / "test.db")],
@@ -422,3 +454,303 @@ assert 'torch' not in sys.modules
         timeout=30,
     )
     assert result.returncode == 0, result.stderr
+
+
+# --- reindex -----------------------------------------------------------------------
+
+
+def test_empty_reindex_does_not_load_a_model(run, embedding_module):
+    assert run("reindex") == (0, "no documents to reindex\n", "")
+    assert embedding_module.instances == []
+
+
+def test_reindex_help_does_not_create_a_database(run, db_path):
+    with pytest.raises(SystemExit) as exc:
+        run("reindex", "--help")
+    assert exc.value.code == 0
+    assert not db_path.exists()
+
+
+def test_reindex_rejects_document_arguments(run):
+    with pytest.raises(SystemExit) as exc:
+        run("reindex", "1")
+    assert exc.value.code == 2
+
+
+def test_reindex_retries_old_errors_and_reprocesses_indexed_documents(run, two_docs, db_path, embedding_module):
+    assert run("index")[0] == 0
+    conn = connect(db_path)
+    try:
+        with conn:
+            conn.execute("UPDATE documents SET status = 'error', error = 'Old error' WHERE id = 2")
+    finally:
+        conn.close()
+
+    assert run("reindex") == (0, "reindexing 2 documents...\nindexed 2 documents\n", "")
+
+    assert len(embedding_module.instances) == 2
+    assert embedding_module.instances[-1].calls == [["Hello world!"], ["Hello mondo!"]]
+    assert read_document_states(db_path) == [(1, "indexed", None), (2, "indexed", None)]
+
+
+@pytest.mark.parametrize("metadata", ["unknown", "incompatible"])
+def test_index_reports_settings_problem_and_explicit_reindex_repairs_it(
+    run, two_docs, db_path, embedding_module, metadata
+):
+    assert run("index")[0] == 0
+    conn = connect(db_path)
+    try:
+        with conn:
+            if metadata == "unknown":
+                conn.execute("DELETE FROM index_settings")
+            else:
+                conn.execute("UPDATE index_settings SET chunk_max_tokens = 300")
+            conn.execute("UPDATE documents SET status = 'processing' WHERE id = 2")
+    finally:
+        conn.close()
+    before = read_document_states(db_path)
+
+    code, out, error = run("index")
+
+    assert code == 1
+    assert out == "indexing 1 documents...\n"
+    assert "esper reindex" in error
+    assert "Traceback" not in error
+    assert embedding_module.instances[-1].calls == []
+    assert read_document_states(db_path) == before
+    assert run("reindex")[0] == 0
+
+
+def test_reindex_load_failure_preserves_existing_index(run, two_docs, db_path, embedding_module):
+    assert run("index")[0] == 0
+    conn = connect(db_path)
+    try:
+        before = [tuple(row) for row in conn.execute("SELECT rowid, embedding FROM chunks_vec")]
+    finally:
+        conn.close()
+    states = read_document_states(db_path)
+
+    def fail_to_load():
+        raise RuntimeError("Model unavailable")
+
+    embedding_module.Embedder = fail_to_load
+    code, out, error = run("reindex")
+    assert code == 1
+    assert out == "reindexing 2 documents...\n"
+    assert "could not load embedding model" in error
+    assert read_document_states(db_path) == states
+    conn = connect(db_path)
+    try:
+        assert [tuple(row) for row in conn.execute("SELECT rowid, embedding FROM chunks_vec")] == before
+    finally:
+        conn.close()
+
+
+def test_reindex_reports_current_document_failures(run, make_file, embedding_module):
+    run("import", str(make_file("bad.bin", "Unsupported PDF.")))
+    assert run("reindex") == (
+        1,
+        "reindexing 1 documents...\nindexed 0 documents\n",
+        "error: #1 bad.bin: UnsupportedFormatError: application/octet-stream\n",
+    )
+
+
+def test_reindex_interrupt_has_actionable_message_and_index_resumes(run, two_docs, db_path, embedding_module):
+    assert run("index")[0] == 0
+    base = embedding_module.Embedder
+
+    class InterruptedEmbedder(base):
+        def embed(self, texts):
+            if texts == ["Hello mondo!"]:
+                raise KeyboardInterrupt
+            return super().embed(texts)
+
+    embedding_module.Embedder = InterruptedEmbedder
+    code, out, error = run("reindex")
+    assert code == 130
+    assert out == "reindexing 2 documents...\n"
+    assert "esper index" in error
+    assert read_document_states(db_path) == [(1, "indexed", None), (2, "processing", None)]
+    embedding_module.Embedder = base
+    assert run("index") == (0, "indexing 1 documents...\nindexed 1 documents\n", "")
+    assert embedding_module.instances[-1].calls == [["Hello mondo!"]]
+
+
+def test_reindex_database_error_is_reported_without_a_traceback(run, two_docs, embedding_module, monkeypatch):
+    def fail_reset(*args):
+        raise sqlite3.OperationalError("Reset failed")
+
+    monkeypatch.setattr(cli, "reindex_all", fail_reset)
+    code, out, error = run("reindex")
+    assert code == 1
+    assert out == "reindexing 2 documents...\n"
+    assert error == "error: could not update search index: Reset failed\n"
+
+
+# --- search ------------------------------------------------------------------------
+
+
+def test_search_help_does_not_create_database(run, db_path):
+    with pytest.raises(SystemExit) as exc:
+        run("search", "--help")
+    assert exc.value.code == 0
+    assert not db_path.exists()
+
+
+@pytest.mark.parametrize("arguments", [(), ("hello", "--mode", "invalid"), ("hello", "--limit", "many")])
+def test_search_invalid_arguments_are_parser_errors(run, arguments):
+    with pytest.raises(SystemExit) as exc:
+        run("search", *arguments)
+    assert exc.value.code == 2
+
+
+@pytest.mark.parametrize("arguments", [("",), ("   ",), ("hello", "--limit", "0"), ("hello", "--tag", " ")])
+def test_search_invalid_requests_do_not_load_model(run, embedding_module, arguments):
+    code, out, error = run("search", *arguments)
+    assert code == 1
+    assert out == ""
+    assert error.startswith("error:")
+    assert embedding_module.instances == []
+
+
+def test_search_queued_documents_returns_no_results_without_loading_model(run, two_docs, embedding_module):
+    assert run("search", "hello") == (0, "no results\n", "")
+    assert embedding_module.instances == []
+
+
+def test_search_prints_ranked_source_passages_and_loads_one_model(run, two_docs, embedding_module):
+    assert run("index")[0] == 0
+    run("tag", "1", "notes")
+
+    code, out, error = run("search", "hello", "--limit", "1")
+
+    assert code == 0 and error == ""
+    assert "#   1 a.txt" in out
+    assert "[notes]" in out
+    assert "[both, passage 1] Hello world!" in out
+    assert "b.md" not in out
+    assert len(embedding_module.instances) == 2
+    assert embedding_module.instances[-1].queries == ["hello"]
+
+
+def test_search_json_contains_full_passages_and_metadata(run, two_docs, embedding_module):
+    import json
+    run("index")
+    code, out, error = run("search", "hello", "--json")
+    assert code == 0 and error == ""
+    results = json.loads(out)
+    assert [result["document_id"] for result in results] == [1, 2]
+    assert results[0]["mime_type"] == "text/plain"
+    assert results[0]["matches"][0]["text"] == "Hello world!"
+    assert results[0]["matches"][0]["distance"] == pytest.approx(0)
+    assert results[0]["matches"][0]["via"] == "both"
+    assert isinstance(results[0]["score"], float)
+
+
+def test_search_keyword_mode_does_not_import_model(run, two_docs, embedding_module, monkeypatch):
+    run("index")
+    monkeypatch.setitem(sys.modules, "esper.embedding", None)
+    code, out, error = run("search", "mondo", "--mode", "keyword")
+    assert code == 0 and error == ""
+    assert "b.md" in out and "a.txt" not in out
+    assert "[keyword, passage 1] Hello mondo!" in out
+
+
+def test_search_tag_filters_and_unknown_tags_skip_model_loading(run, two_docs, embedding_module):
+    run("index")
+    run("tag", "2", "Lavoro", "Fatture casa")
+    code, out, error = run("search", "hello", "--tag", "lavoro", "--tag", "fatture casa")
+    assert code == 0 and error == ""
+    assert "b.md" in out and "a.txt" not in out
+    count = len(embedding_module.instances)
+    assert run("search", "hello", "--tag", "missing") == (0, "no results\n", "")
+    assert len(embedding_module.instances) == count
+
+
+def test_search_empty_json_result_is_an_array(run, embedding_module):
+    assert run("search", "hello", "--json") == (0, "[]\n", "")
+    assert embedding_module.instances == []
+
+
+def test_search_reports_model_loading_failure(run, two_docs, embedding_module):
+    run("index")
+
+    def fail():
+        raise RuntimeError("Model unavailable")
+
+    embedding_module.Embedder = fail
+    code, out, error = run("search", "hello")
+    assert code == 1 and out == ""
+    assert error == "error: could not load embedding model: Model unavailable\n"
+
+
+def test_search_reports_inference_failure_without_changing_document_states(run, two_docs, db_path, embedding_module):
+    run("index")
+    before = read_document_states(db_path)
+    base = embedding_module.Embedder
+
+    class BrokenQueryEmbedder(base):
+        def embed_query(self, query):
+            raise RuntimeError("Inference failed")
+
+    embedding_module.Embedder = BrokenQueryEmbedder
+    code, out, error = run("search", "hello")
+    assert code == 1 and out == ""
+    assert error == "error: could not search index: Inference failed\n"
+    assert read_document_states(db_path) == before
+
+
+def test_search_unknown_settings_requires_reindex(run, two_docs, db_path, embedding_module):
+    run("index")
+    conn = connect(db_path)
+    try:
+        with conn:
+            conn.execute("DELETE FROM index_settings")
+    finally:
+        conn.close()
+    code, out, error = run("search", "hello")
+    assert code == 1 and out == ""
+    assert error == "error: Existing index settings are unknown; run 'esper reindex'\n"
+
+
+def test_search_ctrl_c_returns_130(run, two_docs, embedding_module):
+    run("index")
+    base = embedding_module.Embedder
+
+    class InterruptedQueryEmbedder(base):
+        def embed_query(self, query):
+            raise KeyboardInterrupt
+
+    embedding_module.Embedder = InterruptedQueryEmbedder
+    assert run("search", "hello") == (130, "", "interrupted\n")
+
+
+def test_search_displays_part_of_a_long_unbroken_passage_and_keeps_full_json(run, make_file, embedding_module):
+    import json
+    text = "a" * 300
+    run("import", str(make_file("long.txt", text)))
+    assert run("index")[0] == 0
+    code, output, error = run("search", "description", "--mode", "semantic")
+    assert code == 0 and error == ""
+    assert output.splitlines()[1] == "  [semantic, passage 1] " + "a" * 239 + "…"
+    code, output, error = run("search", "description", "--mode", "semantic", "--json")
+    assert code == 0 and error == ""
+    assert json.loads(output)[0]["matches"][0]["text"] == text
+
+
+def test_desktop_help_does_not_open_archive_or_import_qt(run, db_path):
+    with pytest.raises(SystemExit) as exc:
+        run("desktop", "--help")
+    assert exc.value.code == 0
+    assert not db_path.exists()
+
+
+def test_desktop_uses_explicit_archive_without_opening_default_database(run, db_path, tmp_path, monkeypatch):
+    module = ModuleType("esper.desktop.app")
+    paths = []
+    module.run = lambda data_dir: paths.append(data_dir) or 0
+    monkeypatch.setitem(sys.modules, "esper.desktop.app", module)
+    chosen = tmp_path / "separate-archive"
+    assert run("desktop", "--data-dir", str(chosen)) == (0, "", "")
+    assert paths == [chosen]
+    assert not db_path.exists()

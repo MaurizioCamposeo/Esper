@@ -107,11 +107,11 @@ def test_index_settings_start_unknown(conn):
 @pytest.mark.parametrize("overlap", [0, 399])
 def test_index_settings_accept_valid_overlap_boundaries(conn, overlap):
     conn.execute(
-        "INSERT INTO index_settings VALUES (?, ?, ?, ?, ?)",
+        "INSERT INTO index_settings (id, model_name, dimensions, chunk_max_tokens, chunk_overlap_tokens) VALUES (?, ?, ?, ?, ?)",
         (1, "BAAI/bge-m3", 1024, 400, overlap),
     )
     row = conn.execute("SELECT * FROM index_settings WHERE id = 1").fetchone()
-    assert tuple(row) == (1, "BAAI/bge-m3", 1024, 400, overlap)
+    assert tuple(row) == (1, "BAAI/bge-m3", 1024, 400, overlap, 1)
 
 
 @pytest.mark.parametrize(
@@ -130,7 +130,7 @@ def test_index_settings_accept_valid_overlap_boundaries(conn, overlap):
 )
 def test_index_settings_reject_invalid_values(conn, values):
     with pytest.raises(sqlite3.IntegrityError, match="CHECK"):
-        conn.execute("INSERT INTO index_settings VALUES (?, ?, ?, ?, ?)", values)
+        conn.execute("INSERT INTO index_settings (id, model_name, dimensions, chunk_max_tokens, chunk_overlap_tokens) VALUES (?, ?, ?, ?, ?)", values)
     assert conn.execute("SELECT COUNT(*) FROM index_settings").fetchone()[0] == 0
 
 
@@ -139,18 +139,18 @@ def test_index_settings_require_all_settings(conn, field_index):
     values = [1, "BAAI/bge-m3", 1024, 400, 50]
     values[field_index] = None
     with pytest.raises(sqlite3.IntegrityError, match="NOT NULL"):
-        conn.execute("INSERT INTO index_settings VALUES (?, ?, ?, ?, ?)", values)
+        conn.execute("INSERT INTO index_settings (id, model_name, dimensions, chunk_max_tokens, chunk_overlap_tokens) VALUES (?, ?, ?, ?, ?)", values)
 
 
 def test_index_settings_reject_second_row(conn):
-    conn.execute("INSERT INTO index_settings VALUES (1, 'BAAI/bge-m3', 1024, 400, 50)")
+    conn.execute("INSERT INTO index_settings (id, model_name, dimensions, chunk_max_tokens, chunk_overlap_tokens) VALUES (1, 'BAAI/bge-m3', 1024, 400, 50)")
     with pytest.raises(sqlite3.IntegrityError):
         conn.execute(
             "INSERT INTO index_settings (model_name, dimensions, chunk_max_tokens, chunk_overlap_tokens) "
             "VALUES ('other-model', 1024, 300, 25)"
         )
     rows = conn.execute("SELECT * FROM index_settings").fetchall()
-    assert [tuple(row) for row in rows] == [(1, "BAAI/bge-m3", 1024, 400, 50)]
+    assert [tuple(row) for row in rows] == [(1, "BAAI/bge-m3", 1024, 400, 50, 1)]
 
 
 def test_index_settings_survive_reopen_and_schema_initialization(tmp_path):
@@ -159,7 +159,7 @@ def test_index_settings_survive_reopen_and_schema_initialization(tmp_path):
     try:
         init_schema(conn)
         with conn:
-            conn.execute("INSERT INTO index_settings VALUES (1, 'BAAI/bge-m3', 1024, 400, 50)")
+            conn.execute("INSERT INTO index_settings (id, model_name, dimensions, chunk_max_tokens, chunk_overlap_tokens) VALUES (1, 'BAAI/bge-m3', 1024, 400, 50)")
     finally:
         conn.close()
 
@@ -167,7 +167,7 @@ def test_index_settings_survive_reopen_and_schema_initialization(tmp_path):
     try:
         init_schema(conn)
         row = conn.execute("SELECT * FROM index_settings").fetchone()
-        assert tuple(row) == (1, "BAAI/bge-m3", 1024, 400, 50)
+        assert tuple(row) == (1, "BAAI/bge-m3", 1024, 400, 50, 1)
     finally:
         conn.close()
 

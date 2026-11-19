@@ -1,0 +1,1370 @@
+{
+  "schema_version": 1,
+  "name": "esper-text",
+  "version": "1.0",
+  "description": "Fixed fictional development benchmark: Italian personal archive, near duplicates, temporal versions, exact identifiers, multilingual queries, typos, multi-relevant labels, tags, long text and unanswerable queries. Hand-authored labels; not an independent or real-user test set. Frozen before the first benchmark run.",
+  "documents": [
+    {
+      "key": "boiler_replacement",
+      "tags": [
+        "casa",
+        "riscaldamento"
+      ],
+      "text": "# Installazione del generatore termico\nIl 18 novembre 2025 la ditta Termica Nord ha rimosso il vecchio apparecchio del riscaldamento e installato una caldaia a condensazione. Il costo complessivo della sostituzione è di 2.400 euro, inclusi montaggio e smaltimento. Garanzia di due anni sul nuovo impianto. Questo documento riguarda l'acquisto e l'installazione, non la manutenzione annuale.",
+      "format": "md"
+    },
+    {
+      "key": "boiler_service",
+      "tags": [
+        "casa",
+        "riscaldamento"
+      ],
+      "text": "# Controllo periodico dell'impianto termico\nIl tecnico ha effettuato la pulizia del bruciatore e l'analisi dei fumi il 9 ottobre 2026. La manutenzione annuale della caldaia è costata 95 euro. Il rendimento risulta regolare e il libretto è aggiornato. Prossima verifica consigliata fra dodici mesi. Non sono stati acquistati o sostituiti apparecchi.",
+      "format": "md"
+    },
+    {
+      "key": "electricity_bill",
+      "tags": [
+        "casa",
+        "energia"
+      ],
+      "text": "# Fattura energia elettrica di febbraio\nFornitura dell'appartamento in via dei Tigli. Nel mese di febbraio 2026 il consumo di corrente è stato di 142 kWh. Totale della bolletta della luce: 58,70 euro. Addebito sul conto il 18 marzo. Il codice cliente è EL-4827. Non comprende la fornitura di gas.",
+      "format": "md"
+    },
+    {
+      "key": "gas_bill",
+      "tags": [
+        "casa",
+        "energia"
+      ],
+      "text": "# Bolletta metano di febbraio\nIl consumo di gas naturale dell'appartamento in via dei Tigli per febbraio 2026 è di 86 metri cubi. Il gas alimenta i fornelli e il riscaldamento domestico. Importo della fattura: 112,40 euro, con scadenza il 22 marzo. Codice utenza GAS-7193. La luce è fatturata separatamente.",
+      "format": "md"
+    },
+    {
+      "key": "home_lease",
+      "tags": [
+        "casa",
+        "contratti"
+      ],
+      "text": "# Contratto di locazione dell'abitazione\nAppartamento al secondo piano in via dei Tigli, composto da soggiorno, camera e cucina. Canone mensile di 720 euro e deposito cauzionale di 1.440 euro. Il contratto di affitto scade il 30 settembre 2028. Il preavviso per la disdetta è di sei mesi. Il posto auto non è incluso nel contratto.",
+      "format": "md"
+    },
+    {
+      "key": "parking_lease",
+      "tags": [
+        "casa",
+        "contratti"
+      ],
+      "text": "# Affitto del posto auto coperto\nLocazione del box numero 14 nel cortile di via dei Tigli. Il parcheggio costa 90 euro al mese. Il contratto del garage termina il 31 dicembre 2027 e può essere disdetto con preavviso di trenta giorni. Non riguarda la locazione dell'appartamento. Chiave del cancello consegnata all'inizio del rapporto.",
+      "format": "md"
+    },
+    {
+      "key": "home_insurance",
+      "tags": [
+        "casa",
+        "assicurazioni"
+      ],
+      "text": "# Polizza protezione abitazione\nCopertura assicurativa per incendio, perdite d'acqua e danni da grandine al tetto. Il premio annuale è di 184 euro. La franchigia per eventi atmosferici è di 250 euro. Il furto di biciclette lasciate all'aperto è escluso. Polizza CASA-6042, valida fino al 15 aprile 2027. Per aprire un sinistro occorre allegare fotografie e preventivi.",
+      "format": "md"
+    },
+    {
+      "key": "train_ticket",
+      "tags": [
+        "viaggi",
+        "treno"
+      ],
+      "text": "# Prenotazione ferroviaria per Torino\nViaggio in treno da Milano Centrale a Torino Porta Nuova il 12 giugno 2026. Partenza alle 08:10, arrivo alle 09:15. Carrozza 4, posto 22A. Codice di prenotazione TR-6428. Il biglietto ferroviario è costato 29 euro ed è modificabile prima della partenza. Il documento non include tratte aeree o pernottamenti.",
+      "format": "md"
+    },
+    {
+      "key": "flight_ticket",
+      "tags": [
+        "viaggi",
+        "aereo"
+      ],
+      "text": "# Conferma del volo per Lisbona\nVolo da Milano Malpensa a Lisbona il 3 luglio 2026. Decollo alle 14:35, atterraggio alle 16:30 ora locale. Prenotazione AER-9182, posto 18C. Tariffa di 146 euro con un bagaglio a mano. Il check-in apre quarantotto ore prima del decollo. Non è una prenotazione ferroviaria.",
+      "format": "md"
+    },
+    {
+      "key": "hotel_booking",
+      "tags": [
+        "viaggi",
+        "alloggi"
+      ],
+      "text": "# Soggiorno presso Casa del Porto\nConferma alberghiera a Lisbona per due persone dal 3 al 6 luglio 2026, tre notti. Camera doppia con colazione inclusa. Costo totale 276 euro, tassa di soggiorno esclusa. Cancellazione gratuita fino al 28 giugno. L'accettazione in hotel è disponibile dalle 15:00. La prenotazione riguarda soltanto il pernottamento.",
+      "format": "md"
+    },
+    {
+      "key": "dental_invoice",
+      "tags": [
+        "salute",
+        "ricevute"
+      ],
+      "text": "# Ricevuta dello studio odontoiatrico\nPrestazione del 21 maggio 2026: igiene orale professionale e otturazione di un molare. Onorario totale di 165 euro, saldato con carta. La fattura sanitaria numero OD-318 viene rilasciata per la detrazione fiscale. Non sono state effettuate visite oculistiche. Documento dimostrativo con dati interamente inventati.",
+      "format": "md"
+    },
+    {
+      "key": "eye_exam",
+      "tags": [
+        "salute",
+        "referti"
+      ],
+      "text": "# Controllo della vista\nVisita oculistica del 4 settembre 2026. La prescrizione degli occhiali indica una correzione di -1,25 diottrie a destra e -1,50 a sinistra. Pressione oculare nei limiti. Consigliato un controllo tra un anno. Il referto riguarda la vista e non contiene cure odontoiatriche. Dati fittizi per dimostrazione.",
+      "format": "md"
+    },
+    {
+      "key": "vet_visit",
+      "tags": [
+        "animali",
+        "ricevute"
+      ],
+      "text": "# Visita veterinaria del gatto\nRichiamo del vaccino e controllo generale di un felino domestico il 16 marzo 2026. Il veterinario ha aggiornato il libretto sanitario. Peso registrato: 4,2 chilogrammi. Costo della visita e della vaccinazione: 68 euro. Prossimo richiamo tra dodici mesi. Animale e prestazione sono inventati per il corpus dimostrativo.",
+      "format": "md"
+    },
+    {
+      "key": "bike_purchase",
+      "tags": [
+        "bicicletta",
+        "acquisti"
+      ],
+      "text": "# Acquisto della bicicletta da città\nRicevuta del negozio Due Ruote per una bici urbana modello Vela, telaio blu, misura M. Prezzo di acquisto 480 euro, pagato il 7 aprile 2026. La garanzia sul telaio dura cinque anni. Numero di telaio BICI-5038. Casco e lucchetto sono stati acquistati separatamente. Non si tratta di una riparazione.",
+      "format": "md"
+    },
+    {
+      "key": "bike_repair",
+      "tags": [
+        "bicicletta",
+        "manutenzione"
+      ],
+      "text": "# Riparazione in officina ciclistica\nIntervento sulla bicicletta il 19 agosto 2026: sostituzione della camera d'aria posteriore, centratura della ruota e registrazione dei freni. Il costo complessivo della riparazione è di 42 euro. Il meccanico raccomanda di controllare la pressione degli pneumatici ogni mese. Non è stato acquistato un nuovo veicolo.",
+      "format": "md"
+    },
+    {
+      "key": "laptop_warranty",
+      "tags": [
+        "informatica",
+        "garanzie"
+      ],
+      "text": "# Garanzia del computer portatile\nNotebook modello Aurora 14, acquistato il 2 febbraio 2026 per 899 euro. Copertura per difetti di fabbricazione fino al 2 febbraio 2028. Per richiedere assistenza occorrono prova d'acquisto e seriale NB-2846. Danni da liquidi e cadute sono esclusi. La batteria è coperta per il primo anno.",
+      "format": "md"
+    },
+    {
+      "key": "sql_notes",
+      "tags": [
+        "studio",
+        "informatica"
+      ],
+      "text": "# Appunti sulle basi di dati relazionali\nUna JOIN collega righe di tabelle diverse mediante colonne comuni. Le chiavi esterne mantengono l'integrità dei riferimenti. Una transazione SQL raggruppa aggiornamenti atomici: COMMIT li conferma, ROLLBACK li annulla. Gli indici accelerano le letture ma aggiungono lavoro alle scritture. SQLite conserva il database in un file locale.",
+      "format": "md"
+    },
+    {
+      "key": "neural_notes",
+      "tags": [
+        "studio",
+        "informatica"
+      ],
+      "text": "# Appunti sull'apprendimento delle reti neurali\nLa retropropagazione calcola il gradiente della funzione di perdita rispetto ai pesi del modello. La discesa del gradiente aggiorna i parametri per ridurre l'errore. Un embedding rappresenta il significato di un testo mediante un vettore numerico. L'addestramento contrastivo avvicina esempi simili e allontana quelli differenti.",
+      "format": "md"
+    },
+    {
+      "key": "library_receipt",
+      "tags": [
+        "cultura",
+        "libri"
+      ],
+      "text": "# Prestito della biblioteca civica\nPreso in prestito il romanzo Il sentiero dei giardini il 10 ottobre 2026. La restituzione del libro è prevista entro il 9 novembre. È ammesso un rinnovo di trenta giorni se non vi sono prenotazioni. Tessera dimostrativa LIB-5721. Il prestito è gratuito e non equivale all'acquisto del volume.",
+      "format": "md"
+    },
+    {
+      "key": "museum_ticket",
+      "tags": [
+        "cultura",
+        "biglietti"
+      ],
+      "text": "# Ingresso alla mostra di fotografia\nBiglietto per l'esposizione Luci sul porto presso il Museo Civico, domenica 25 ottobre 2026 alle 11:00. Prezzo 12 euro. L'ingresso comprende le sale della mostra temporanea ma non la visita guidata. Conservare il codice QR fino all'uscita. Mostra e museo sono inventati per questo esempio.",
+      "format": "md"
+    },
+    {
+      "key": "wifi_old",
+      "format": "txt",
+      "text": "Rete ospiti, istruzioni 2024\n\nLa rete ospiti si chiama AuroraGuest. La password provvisoria è Cedro482. Queste istruzioni del 2024 sono state sostituite dal promemoria del 2026.",
+      "tags": [
+        "challenge",
+        "version"
+      ]
+    },
+    {
+      "key": "wifi_new",
+      "format": "txt",
+      "text": "Rete ospiti, istruzioni 2026\n\nDal 3 novembre 2026 la rete ospiti si chiama AuroraVisitatori e la password è Faggio739. Il vecchio accesso AuroraGuest è disabilitato. Non usare il foglio del 2024.",
+      "tags": [
+        "challenge",
+        "version"
+      ]
+    },
+    {
+      "key": "return_keyboard",
+      "format": "txt",
+      "text": "Reso tastiera ordine ZX-184\n\nLa tastiera meccanica dell’ordine ZX-184 ha un tasto bloccato. Il venditore accetta il reso entro il 18 novembre. Il rimborso di 84 euro arriva sulla carta; non è una sostituzione.",
+      "tags": [
+        "challenge",
+        "near_duplicate"
+      ]
+    },
+    {
+      "key": "return_mouse",
+      "format": "txt",
+      "text": "Reso mouse ordine ZX-148\n\nIl mouse wireless dell’ordine ZX-148 perde la connessione. Il venditore invia un prodotto sostitutivo entro il 18 novembre. Non è previsto rimborso sulla carta. Valore: 48 euro.",
+      "tags": [
+        "challenge",
+        "identifier"
+      ]
+    },
+    {
+      "key": "cancel_gym",
+      "format": "txt",
+      "text": "Disdetta palestra\n\nL’abbonamento annuale alla palestra Forma termina il 31 dicembre. La disdetta va inviata tramite PEC almeno trenta giorni prima. Una telefonata alla reception non è sufficiente.",
+      "tags": [
+        "challenge",
+        "paraphrase"
+      ]
+    },
+    {
+      "key": "cancel_stream",
+      "format": "txt",
+      "text": "Disdetta servizio film\n\nIl servizio CinemaSera si può interrompere dalle impostazioni dell’account, sezione Pagamenti. La visione resta disponibile fino alla fine del mese pagato. Nessuna PEC richiesta.",
+      "tags": [
+        "challenge",
+        "paraphrase"
+      ]
+    },
+    {
+      "key": "recipe_bread",
+      "format": "txt",
+      "text": "Pane senza impasto\n\nPer il pane senza impasto servono 500 grammi di farina, 350 di acqua e due grammi di lievito secco. Riposo di dodici ore. Cuocere nella pentola coperta a 230 gradi.",
+      "tags": [
+        "challenge",
+        "paraphrase"
+      ]
+    },
+    {
+      "key": "recipe_cake",
+      "format": "txt",
+      "text": "Torta al limone\n\nMescolare farina, uova, zucchero e scorza di limone. Usare lievito istantaneo per dolci e infornare subito. Cuocere a 175 gradi per quaranta minuti.",
+      "tags": [
+        "challenge",
+        "negation"
+      ]
+    },
+    {
+      "key": "backup_restore",
+      "format": "txt",
+      "text": "Ripristino archivio fotografico\n\nIl backup delle fotografie è sul disco esterno Argento. Per recuperare uno scatto cancellato aprire Istantanee e scegliere la data precedente alla cancellazione. Copiare il file recuperato in una cartella diversa.",
+      "tags": [
+        "challenge",
+        "cross_language"
+      ]
+    },
+    {
+      "key": "backup_exclusions",
+      "format": "txt",
+      "text": "Esclusioni dal backup\n\nIl disco Argento salva fotografie e documenti. Le cartelle Download e Cache sono escluse. I video temporanei nella cartella Montaggio non sono inclusi. Non cancellare l’unica copia di queste cartelle.",
+      "tags": [
+        "challenge",
+        "negation"
+      ]
+    },
+    {
+      "key": "plant_fern",
+      "format": "txt",
+      "text": "Cura della felce\n\nLa felce vuole luce indiretta, terriccio leggermente umido e umidità elevata. Il sole diretto brucia le foglie. Controllare il terreno due volte alla settimana senza lasciare acqua nel sottovaso.",
+      "tags": [
+        "challenge",
+        "paraphrase"
+      ]
+    },
+    {
+      "key": "plant_cactus",
+      "format": "txt",
+      "text": "Cura del cactus\n\nIl cactus vuole molta luce e terriccio drenante. Lasciare asciugare completamente tra due annaffiature. In inverno ridurre molto l’acqua. L’umidità costante può causare marciume alle radici.",
+      "tags": [
+        "challenge",
+        "near_duplicate"
+      ]
+    },
+    {
+      "key": "meeting_may",
+      "format": "txt",
+      "text": "Verbale condominio maggio\n\nAssemblea del 12 maggio: il preventivo per sostituire l’ascensore è stato respinto. È stata approvata soltanto la riparazione delle porte al piano terra, costo 1800 euro.",
+      "tags": [
+        "challenge",
+        "negation"
+      ]
+    },
+    {
+      "key": "meeting_october",
+      "format": "txt",
+      "text": "Verbale condominio ottobre\n\nAssemblea del 20 ottobre: approvata la sostituzione dell’ascensore per 42000 euro. La spesa è divisa in tre rate con scadenza gennaio, aprile e luglio. Le porte erano state riparate a maggio.",
+      "tags": [
+        "challenge",
+        "version"
+      ]
+    },
+    {
+      "key": "passport",
+      "format": "txt",
+      "text": "Ritiro passaporto\n\nPratica PA-9307. Il nuovo passaporto è pronto per il ritiro allo sportello documenti il martedì dalle 9 alle 12. Portare la ricevuta e un documento di identità. Non serve una nuova fotografia.",
+      "tags": [
+        "challenge",
+        "identifier"
+      ]
+    },
+    {
+      "key": "id_card",
+      "format": "txt",
+      "text": "Carta identità elettronica\n\nPratica CI-9307. La carta di identità elettronica viene spedita a domicilio. Conservare la ricevuta per il tracciamento. Per una nuova richiesta occorre una fotografia recente.",
+      "tags": [
+        "challenge",
+        "near_duplicate"
+      ]
+    },
+    {
+      "key": "english_storage",
+      "format": "txt",
+      "text": "Storage unit agreement\n\nThe storage locker at Oak Street costs 65 euros per month. Access is allowed from 6 am to 10 pm. Flammable liquids are prohibited. The locker is for furniture, not for parking vehicles.",
+      "tags": [
+        "challenge",
+        "cross_language"
+      ]
+    },
+    {
+      "key": "english_parking",
+      "format": "txt",
+      "text": "Parking permit\n\nThe Oak Street parking permit costs 35 euros per month. It allows one registered car in the outdoor lot. Furniture storage is prohibited. The permit expires on 30 September.",
+      "tags": [
+        "challenge",
+        "cross_language"
+      ]
+    },
+    {
+      "key": "refund_train",
+      "format": "txt",
+      "text": "Rimborso treno annullato\n\nLa corsa regionale del 9 agosto è stata annullata. Richiesta RM-771 presentata il 10 agosto: rimborso integrale di 19 euro sul conto. La richiesta risulta approvata.",
+      "tags": [
+        "challenge",
+        "typo"
+      ]
+    },
+    {
+      "key": "refund_flight",
+      "format": "txt",
+      "text": "Rimborso aereo annullato\n\nIl volo del 9 agosto è stato annullato. Richiesta RM-717: la compagnia propone un buono viaggio di 190 euro. Il rimborso in denaro non è ancora stato approvato.",
+      "tags": [
+        "challenge",
+        "near_duplicate"
+      ]
+    },
+    {
+      "key": "course_sql",
+      "format": "txt",
+      "text": "Corso database calendario\n\nIl corso sui database relazionali si svolge il mercoledì alle 18 in aula B. Il programma comprende join, indici, transazioni e normalizzazione. L’esame è il 14 dicembre e richiede una query SQL scritta.",
+      "tags": [
+        "challenge",
+        "near_duplicate"
+      ]
+    },
+    {
+      "key": "course_neural",
+      "format": "txt",
+      "text": "Corso apprendimento automatico calendario\n\nIl corso sulle reti neurali si svolge il giovedì alle 16 in aula D. Il programma comprende gradienti, ottimizzazione e regolarizzazione. La prova finale è un progetto da consegnare il 20 dicembre.",
+      "tags": [
+        "challenge",
+        "cross_language"
+      ]
+    },
+    {
+      "key": "warranty_phone",
+      "format": "txt",
+      "text": "Garanzia telefono\n\nIl telefono comprato il 7 marzo è coperto per difetti di fabbricazione. Il danno accidentale al vetro non è incluso. Per l’assistenza conservare la fattura e il codice seriale PH-882.",
+      "tags": [
+        "challenge",
+        "negation"
+      ]
+    },
+    {
+      "key": "insurance_phone",
+      "format": "txt",
+      "text": "Polizza danni telefono\n\nLa polizza SchermoSicuro copre la rottura accidentale del display del telefono PH-882. È prevista una franchigia di 45 euro. I difetti di fabbricazione vanno gestiti con la garanzia del venditore.",
+      "tags": [
+        "challenge",
+        "near_duplicate"
+      ]
+    },
+    {
+      "key": "workshop_manual",
+      "format": "md",
+      "text": "# Accesso\n\nIl laboratorio condiviso apre alle otto e chiude alle venti. Ogni socio registra ingresso e uscita nel registro vicino alla porta.\n\nIl laboratorio condiviso apre alle otto e chiude alle venti. Ogni socio registra ingresso e uscita nel registro vicino alla porta.\n\nIl laboratorio condiviso apre alle otto e chiude alle venti. Ogni socio registra ingresso e uscita nel registro vicino alla porta.\n\nIl laboratorio condiviso apre alle otto e chiude alle venti. Ogni socio registra ingresso e uscita nel registro vicino alla porta.\n\nIl laboratorio condiviso apre alle otto e chiude alle venti. Ogni socio registra ingresso e uscita nel registro vicino alla porta.\n\nIl laboratorio condiviso apre alle otto e chiude alle venti. Ogni socio registra ingresso e uscita nel registro vicino alla porta.\n\nIl laboratorio condiviso apre alle otto e chiude alle venti. Ogni socio registra ingresso e uscita nel registro vicino alla porta.\n\nIl laboratorio condiviso apre alle otto e chiude alle venti. Ogni socio registra ingresso e uscita nel registro vicino alla porta.\n\n# Prenotazioni\n\nLe postazioni si prenotano nel calendario comune. Le sessioni durano due ore e possono essere annullate fino alla sera precedente.\n\nLe postazioni si prenotano nel calendario comune. Le sessioni durano due ore e possono essere annullate fino alla sera precedente.\n\nLe postazioni si prenotano nel calendario comune. Le sessioni durano due ore e possono essere annullate fino alla sera precedente.\n\nLe postazioni si prenotano nel calendario comune. Le sessioni durano due ore e possono essere annullate fino alla sera precedente.\n\nLe postazioni si prenotano nel calendario comune. Le sessioni durano due ore e possono essere annullate fino alla sera precedente.\n\nLe postazioni si prenotano nel calendario comune. Le sessioni durano due ore e possono essere annullate fino alla sera precedente.\n\nLe postazioni si prenotano nel calendario comune. Le sessioni durano due ore e possono essere annullate fino alla sera precedente.\n\nLe postazioni si prenotano nel calendario comune. Le sessioni durano due ore e possono essere annullate fino alla sera precedente.\n\n# Materiali\n\nOgni socio conserva i propri materiali in un contenitore etichettato. Non lasciare oggetti nei corridoi e ripulire la postazione dopo ogni sessione.\n\nOgni socio conserva i propri materiali in un contenitore etichettato. Non lasciare oggetti nei corridoi e ripulire la postazione dopo ogni sessione.\n\nOgni socio conserva i propri materiali in un contenitore etichettato. Non lasciare oggetti nei corridoi e ripulire la postazione dopo ogni sessione.\n\nOgni socio conserva i propri materiali in un contenitore etichettato. Non lasciare oggetti nei corridoi e ripulire la postazione dopo ogni sessione.\n\nOgni socio conserva i propri materiali in un contenitore etichettato. Non lasciare oggetti nei corridoi e ripulire la postazione dopo ogni sessione.\n\nOgni socio conserva i propri materiali in un contenitore etichettato. Non lasciare oggetti nei corridoi e ripulire la postazione dopo ogni sessione.\n\nOgni socio conserva i propri materiali in un contenitore etichettato. Non lasciare oggetti nei corridoi e ripulire la postazione dopo ogni sessione.\n\nOgni socio conserva i propri materiali in un contenitore etichettato. Non lasciare oggetti nei corridoi e ripulire la postazione dopo ogni sessione.\n\n# Prestiti\n\nGli strumenti possono essere presi in prestito per tre giorni compilando il modulo. Le restituzioni vanno registrate e i danni segnalati al responsabile.\n\nGli strumenti possono essere presi in prestito per tre giorni compilando il modulo. Le restituzioni vanno registrate e i danni segnalati al responsabile.\n\nGli strumenti possono essere presi in prestito per tre giorni compilando il modulo. Le restituzioni vanno registrate e i danni segnalati al responsabile.\n\nGli strumenti possono essere presi in prestito per tre giorni compilando il modulo. Le restituzioni vanno registrate e i danni segnalati al responsabile.\n\nGli strumenti possono essere presi in prestito per tre giorni compilando il modulo. Le restituzioni vanno registrate e i danni segnalati al responsabile.\n\nGli strumenti possono essere presi in prestito per tre giorni compilando il modulo. Le restituzioni vanno registrate e i danni segnalati al responsabile.\n\nGli strumenti possono essere presi in prestito per tre giorni compilando il modulo. Le restituzioni vanno registrate e i danni segnalati al responsabile.\n\nGli strumenti possono essere presi in prestito per tre giorni compilando il modulo. Le restituzioni vanno registrate e i danni segnalati al responsabile.\n\n# Riunioni\n\nLa riunione dei soci si tiene il primo lunedì del mese. Il verbale viene distribuito nella bacheca del laboratorio dopo l’approvazione.\n\nLa riunione dei soci si tiene il primo lunedì del mese. Il verbale viene distribuito nella bacheca del laboratorio dopo l’approvazione.\n\nLa riunione dei soci si tiene il primo lunedì del mese. Il verbale viene distribuito nella bacheca del laboratorio dopo l’approvazione.\n\nLa riunione dei soci si tiene il primo lunedì del mese. Il verbale viene distribuito nella bacheca del laboratorio dopo l’approvazione.\n\nLa riunione dei soci si tiene il primo lunedì del mese. Il verbale viene distribuito nella bacheca del laboratorio dopo l’approvazione.\n\nLa riunione dei soci si tiene il primo lunedì del mese. Il verbale viene distribuito nella bacheca del laboratorio dopo l’approvazione.\n\nLa riunione dei soci si tiene il primo lunedì del mese. Il verbale viene distribuito nella bacheca del laboratorio dopo l’approvazione.\n\nLa riunione dei soci si tiene il primo lunedì del mese. Il verbale viene distribuito nella bacheca del laboratorio dopo l’approvazione.\n\n# Chiavi\n\nPer una chiave smarrita contattare esclusivamente la custode Nora al numero interno 214. Non contattare il servizio prenotazioni; non distribuisce copie delle chiavi.\n\nPer una chiave smarrita contattare esclusivamente la custode Nora al numero interno 214. Non contattare il servizio prenotazioni; non distribuisce copie delle chiavi.\n\nPer una chiave smarrita contattare esclusivamente la custode Nora al numero interno 214. Non contattare il servizio prenotazioni; non distribuisce copie delle chiavi.\n\nPer una chiave smarrita contattare esclusivamente la custode Nora al numero interno 214. Non contattare il servizio prenotazioni; non distribuisce copie delle chiavi.\n\nPer una chiave smarrita contattare esclusivamente la custode Nora al numero interno 214. Non contattare il servizio prenotazioni; non distribuisce copie delle chiavi.\n\nPer una chiave smarrita contattare esclusivamente la custode Nora al numero interno 214. Non contattare il servizio prenotazioni; non distribuisce copie delle chiavi.\n\nPer una chiave smarrita contattare esclusivamente la custode Nora al numero interno 214. Non contattare il servizio prenotazioni; non distribuisce copie delle chiavi.\n\nPer una chiave smarrita contattare esclusivamente la custode Nora al numero interno 214. Non contattare il servizio prenotazioni; non distribuisce copie delle chiavi.",
+      "tags": [
+        "challenge",
+        "manuale"
+      ]
+    }
+  ],
+  "queries": [
+    {
+      "query": "Quanto ho pagato per sostituire il vecchio impianto di riscaldamento?",
+      "relevant_documents": [
+        "boiler_replacement"
+      ],
+      "id": "demo-001",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "La garanzia dell'apparecchio a condensazione appena installato",
+      "relevant_documents": [
+        "boiler_replacement"
+      ],
+      "id": "demo-002",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "Il rapporto del tecnico che ha pulito il bruciatore e controllato i fumi",
+      "relevant_documents": [
+        "boiler_service"
+      ],
+      "id": "demo-003",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "Quando devo rifare la manutenzione annuale della caldaia?",
+      "relevant_documents": [
+        "boiler_service"
+      ],
+      "id": "demo-004",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "La fattura con i chilowattora consumati in febbraio",
+      "relevant_documents": [
+        "electricity_bill"
+      ],
+      "id": "demo-005",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "Quanto è costata la corrente elettrica dell'appartamento?",
+      "relevant_documents": [
+        "electricity_bill"
+      ],
+      "tags": [
+        "casa",
+        "energia"
+      ],
+      "id": "demo-006",
+      "slices": [
+        "development",
+        "tag_filter"
+      ]
+    },
+    {
+      "query": "Il conto del metano con 86 metri cubi di consumo",
+      "relevant_documents": [
+        "gas_bill"
+      ],
+      "id": "demo-007",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "Le bollette dei consumi di energia domestica di febbraio",
+      "relevant_documents": [
+        "gas_bill",
+        "electricity_bill"
+      ],
+      "id": "demo-008",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "Quanto preavviso serve per lasciare l'appartamento in affitto?",
+      "relevant_documents": [
+        "home_lease"
+      ],
+      "id": "demo-009",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "Il contratto di casa con il deposito di 1440 euro",
+      "relevant_documents": [
+        "home_lease"
+      ],
+      "id": "demo-010",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "Quando scade l'affitto del box dove parcheggio?",
+      "relevant_documents": [
+        "parking_lease"
+      ],
+      "id": "demo-011",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "Il documento del garage da novanta euro mensili",
+      "relevant_documents": [
+        "parking_lease"
+      ],
+      "id": "demo-012",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "L'assicurazione copre il tetto danneggiato dalla grandine?",
+      "relevant_documents": [
+        "home_insurance"
+      ],
+      "id": "demo-013",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "La franchigia per gli eventi atmosferici sulla casa",
+      "relevant_documents": [
+        "home_insurance"
+      ],
+      "id": "demo-014",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "Il biglietto per andare a Torino in ferrovia",
+      "relevant_documents": [
+        "train_ticket"
+      ],
+      "id": "demo-015",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "Dove sono seduto sul treno del 12 giugno?",
+      "relevant_documents": [
+        "train_ticket"
+      ],
+      "id": "demo-016",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "La conferma dell'aereo da Malpensa al Portogallo",
+      "relevant_documents": [
+        "flight_ticket"
+      ],
+      "id": "demo-017",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "Quanto bagaglio posso portare sul volo per Lisbona?",
+      "relevant_documents": [
+        "flight_ticket"
+      ],
+      "id": "demo-018",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "La prenotazione per dormire tre notti a Lisbona",
+      "relevant_documents": [
+        "hotel_booking"
+      ],
+      "id": "demo-019",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "Fino a quando posso annullare l'albergo senza pagare?",
+      "relevant_documents": [
+        "hotel_booking"
+      ],
+      "id": "demo-020",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "La ricevuta del dentista per l'otturazione",
+      "relevant_documents": [
+        "dental_invoice"
+      ],
+      "id": "demo-021",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "Quanto ho speso per farmi curare i denti?",
+      "relevant_documents": [
+        "dental_invoice"
+      ],
+      "id": "demo-022",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "Il referto con le diottrie per rifare gli occhiali",
+      "relevant_documents": [
+        "eye_exam"
+      ],
+      "id": "demo-023",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "La visita che misura la pressione degli occhi",
+      "relevant_documents": [
+        "eye_exam"
+      ],
+      "id": "demo-024",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "Quando è previsto il prossimo vaccino del gatto?",
+      "relevant_documents": [
+        "vet_visit"
+      ],
+      "id": "demo-025",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "La spesa per il richiamo dal veterinario",
+      "relevant_documents": [
+        "vet_visit"
+      ],
+      "id": "demo-026",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "Lo scontrino della bici urbana blu comprata ad aprile",
+      "relevant_documents": [
+        "bike_purchase"
+      ],
+      "id": "demo-027",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "Dove trovo il numero del telaio della mia bicicletta?",
+      "relevant_documents": [
+        "bike_purchase"
+      ],
+      "id": "demo-028",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "Il conto dell'officina per la gomma bucata e i freni",
+      "relevant_documents": [
+        "bike_repair"
+      ],
+      "id": "demo-029",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "Quanto ho pagato per sistemare la ruota posteriore?",
+      "relevant_documents": [
+        "bike_repair"
+      ],
+      "id": "demo-030",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "Fino a quando è coperto il portatile per difetti?",
+      "relevant_documents": [
+        "laptop_warranty"
+      ],
+      "id": "demo-031",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "I documenti necessari per mandare il notebook in assistenza",
+      "relevant_documents": [
+        "laptop_warranty"
+      ],
+      "id": "demo-032",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "Gli appunti che spiegano come collegare due tabelle",
+      "relevant_documents": [
+        "sql_notes"
+      ],
+      "id": "demo-033",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "Come annullare gli aggiornamenti di una transazione SQLite?",
+      "relevant_documents": [
+        "sql_notes"
+      ],
+      "tags": [
+        "studio",
+        "informatica"
+      ],
+      "id": "demo-034",
+      "slices": [
+        "development",
+        "tag_filter"
+      ]
+    },
+    {
+      "query": "Le note su come si aggiornano i pesi durante l'addestramento",
+      "relevant_documents": [
+        "neural_notes"
+      ],
+      "id": "demo-035",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "La spiegazione dei vettori che rappresentano il significato delle frasi",
+      "relevant_documents": [
+        "neural_notes"
+      ],
+      "id": "demo-036",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "Entro quando devo riportare il romanzo preso in prestito?",
+      "relevant_documents": [
+        "library_receipt"
+      ],
+      "id": "demo-037",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "Posso rinnovare il libro della biblioteca per un altro mese?",
+      "relevant_documents": [
+        "library_receipt"
+      ],
+      "id": "demo-038",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "Il biglietto della mostra fotografica al museo",
+      "relevant_documents": [
+        "museum_ticket"
+      ],
+      "id": "demo-039",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "query": "A che ora posso entrare a vedere Luci sul porto?",
+      "relevant_documents": [
+        "museum_ticket"
+      ],
+      "id": "demo-040",
+      "slices": [
+        "development",
+        "italian"
+      ]
+    },
+    {
+      "id": "challenge-wifi_old",
+      "query": "Le vecchie credenziali del wifi per gli ospiti",
+      "relevant_documents": [
+        "wifi_old"
+      ],
+      "slices": [
+        "challenge",
+        "version"
+      ]
+    },
+    {
+      "id": "challenge-wifi_new",
+      "query": "La password aggiornata per collegare gli invitati a internet",
+      "relevant_documents": [
+        "wifi_new"
+      ],
+      "slices": [
+        "challenge",
+        "version"
+      ]
+    },
+    {
+      "id": "challenge-return_keyboard",
+      "query": "Il rimborso per la tastiera difettosa",
+      "relevant_documents": [
+        "return_keyboard"
+      ],
+      "slices": [
+        "challenge",
+        "near_duplicate"
+      ]
+    },
+    {
+      "id": "challenge-return_mouse",
+      "query": "ZX-148",
+      "relevant_documents": [
+        "return_mouse"
+      ],
+      "slices": [
+        "challenge",
+        "identifier"
+      ]
+    },
+    {
+      "id": "challenge-cancel_gym",
+      "query": "Come evitare il rinnovo automatico dell’abbonamento per allenarmi?",
+      "relevant_documents": [
+        "cancel_gym"
+      ],
+      "slices": [
+        "challenge",
+        "paraphrase"
+      ]
+    },
+    {
+      "id": "challenge-cancel_stream",
+      "query": "Dove interrompo il pagamento mensile per vedere i film?",
+      "relevant_documents": [
+        "cancel_stream"
+      ],
+      "slices": [
+        "challenge",
+        "paraphrase"
+      ]
+    },
+    {
+      "id": "challenge-recipe_bread",
+      "query": "La ricetta che lascia lavorare il lievito per tutta la notte",
+      "relevant_documents": [
+        "recipe_bread"
+      ],
+      "slices": [
+        "challenge",
+        "paraphrase"
+      ]
+    },
+    {
+      "id": "challenge-recipe_cake",
+      "query": "La torta che non richiede ore di lievitazione",
+      "relevant_documents": [
+        "recipe_cake"
+      ],
+      "slices": [
+        "challenge",
+        "negation"
+      ]
+    },
+    {
+      "id": "challenge-backup_restore",
+      "query": "I accidentally deleted a photograph; how can I recover it?",
+      "relevant_documents": [
+        "backup_restore"
+      ],
+      "slices": [
+        "challenge",
+        "cross_language"
+      ]
+    },
+    {
+      "id": "challenge-backup_exclusions",
+      "query": "Quali cartelle non vengono salvate sul disco esterno?",
+      "relevant_documents": [
+        "backup_exclusions"
+      ],
+      "slices": [
+        "challenge",
+        "negation"
+      ]
+    },
+    {
+      "id": "challenge-plant_fern",
+      "query": "La pianta da tenere lontana dai raggi diretti e con terra umida",
+      "relevant_documents": [
+        "plant_fern"
+      ],
+      "slices": [
+        "challenge",
+        "paraphrase"
+      ]
+    },
+    {
+      "id": "challenge-plant_cactus",
+      "query": "Quale pianta devo lasciare asciugare prima di darle altra acqua?",
+      "relevant_documents": [
+        "plant_cactus"
+      ],
+      "slices": [
+        "challenge",
+        "near_duplicate"
+      ]
+    },
+    {
+      "id": "challenge-meeting_may",
+      "query": "Il verbale in cui non hanno approvato un ascensore nuovo",
+      "relevant_documents": [
+        "meeting_may"
+      ],
+      "slices": [
+        "challenge",
+        "negation"
+      ]
+    },
+    {
+      "id": "challenge-meeting_october",
+      "query": "Le scadenze delle rate per il nuovo ascensore",
+      "relevant_documents": [
+        "meeting_october"
+      ],
+      "slices": [
+        "challenge",
+        "version"
+      ]
+    },
+    {
+      "id": "challenge-passport",
+      "query": "PA-9307",
+      "relevant_documents": [
+        "passport"
+      ],
+      "slices": [
+        "challenge",
+        "identifier"
+      ]
+    },
+    {
+      "id": "challenge-id_card",
+      "query": "Il documento d’identità che mi consegnano a casa",
+      "relevant_documents": [
+        "id_card"
+      ],
+      "slices": [
+        "challenge",
+        "near_duplicate"
+      ]
+    },
+    {
+      "id": "challenge-english_storage",
+      "query": "Quanto pago per tenere i mobili nel deposito di Oak Street?",
+      "relevant_documents": [
+        "english_storage"
+      ],
+      "slices": [
+        "challenge",
+        "cross_language"
+      ]
+    },
+    {
+      "id": "challenge-english_parking",
+      "query": "Il permesso per lasciare la macchina nel parcheggio di Oak Street",
+      "relevant_documents": [
+        "english_parking"
+      ],
+      "slices": [
+        "challenge",
+        "cross_language"
+      ]
+    },
+    {
+      "id": "challenge-refund_train",
+      "query": "Mi hanno accettato il rimbroso del trneo cancellato?",
+      "relevant_documents": [
+        "refund_train"
+      ],
+      "slices": [
+        "challenge",
+        "typo"
+      ]
+    },
+    {
+      "id": "challenge-refund_flight",
+      "query": "La compagnia mi offre un voucher invece di restituire i soldi",
+      "relevant_documents": [
+        "refund_flight"
+      ],
+      "slices": [
+        "challenge",
+        "near_duplicate"
+      ]
+    },
+    {
+      "id": "challenge-course_sql",
+      "query": "Quando si tiene la lezione sui database e in quale aula?",
+      "relevant_documents": [
+        "course_sql"
+      ],
+      "slices": [
+        "challenge",
+        "near_duplicate"
+      ]
+    },
+    {
+      "id": "challenge-course_neural",
+      "query": "When is the machine learning project due?",
+      "relevant_documents": [
+        "course_neural"
+      ],
+      "slices": [
+        "challenge",
+        "cross_language"
+      ]
+    },
+    {
+      "id": "challenge-warranty_phone",
+      "query": "La garanzia copre lo schermo del telefono se mi cade?",
+      "relevant_documents": [
+        "warranty_phone"
+      ],
+      "slices": [
+        "challenge",
+        "negation"
+      ]
+    },
+    {
+      "id": "challenge-insurance_phone",
+      "query": "L’assicurazione per il vetro rotto del cellulare e la somma a mio carico",
+      "relevant_documents": [
+        "insurance_phone"
+      ],
+      "slices": [
+        "challenge",
+        "near_duplicate"
+      ]
+    },
+    {
+      "id": "extra-both_returns",
+      "query": "I documenti per restituire gli accessori del computer",
+      "relevant_documents": [
+        "return_keyboard",
+        "return_mouse"
+      ],
+      "slices": [
+        "challenge",
+        "multiple"
+      ]
+    },
+    {
+      "id": "extra-both_networks",
+      "query": "Le istruzioni vecchie e nuove per la rete degli ospiti",
+      "relevant_documents": [
+        "wifi_old",
+        "wifi_new"
+      ],
+      "slices": [
+        "challenge",
+        "multiple"
+      ]
+    },
+    {
+      "id": "extra-both_meetings",
+      "query": "I verbali del condominio che parlano dell’ascensore",
+      "relevant_documents": [
+        "meeting_may",
+        "meeting_october"
+      ],
+      "slices": [
+        "challenge",
+        "multiple"
+      ]
+    },
+    {
+      "id": "extra-both_backups",
+      "query": "Le istruzioni sul disco Argento",
+      "relevant_documents": [
+        "backup_restore",
+        "backup_exclusions"
+      ],
+      "slices": [
+        "challenge",
+        "multiple"
+      ]
+    },
+    {
+      "id": "extra-train_code",
+      "query": "RM-771",
+      "relevant_documents": [
+        "refund_train"
+      ],
+      "slices": [
+        "challenge",
+        "identifier"
+      ]
+    },
+    {
+      "id": "extra-flight_code",
+      "query": "RM-717",
+      "relevant_documents": [
+        "refund_flight"
+      ],
+      "slices": [
+        "challenge",
+        "identifier"
+      ]
+    },
+    {
+      "id": "extra-keyboard_code",
+      "query": "ZX-184",
+      "relevant_documents": [
+        "return_keyboard"
+      ],
+      "slices": [
+        "challenge",
+        "identifier"
+      ]
+    },
+    {
+      "id": "extra-card_code",
+      "query": "CI-9307",
+      "relevant_documents": [
+        "id_card"
+      ],
+      "slices": [
+        "challenge",
+        "identifier"
+      ]
+    },
+    {
+      "id": "extra-phone_compare",
+      "query": "I documenti sulla copertura del telefono PH-882",
+      "relevant_documents": [
+        "warranty_phone",
+        "insurance_phone"
+      ],
+      "slices": [
+        "challenge",
+        "multiple"
+      ]
+    },
+    {
+      "id": "extra-fern_typo",
+      "query": "Come annaffiare la flce senza bruciare le folie",
+      "relevant_documents": [
+        "plant_fern"
+      ],
+      "slices": [
+        "challenge",
+        "typo"
+      ]
+    },
+    {
+      "id": "extra-gym_english",
+      "query": "How do I stop my gym membership from renewing?",
+      "relevant_documents": [
+        "cancel_gym"
+      ],
+      "slices": [
+        "challenge",
+        "cross_language"
+      ]
+    },
+    {
+      "id": "extra-bread_english",
+      "query": "The bread recipe that rests overnight",
+      "relevant_documents": [
+        "recipe_bread"
+      ],
+      "slices": [
+        "challenge",
+        "cross_language"
+      ]
+    },
+    {
+      "id": "extra-restore_it",
+      "query": "Recuperare una foto eliminata per sbaglio",
+      "relevant_documents": [
+        "backup_restore"
+      ],
+      "slices": [
+        "challenge",
+        "paraphrase"
+      ]
+    },
+    {
+      "id": "extra-car_fee",
+      "query": "Il parcheggio da 35 euro e non il deposito da 65",
+      "relevant_documents": [
+        "english_parking"
+      ],
+      "slices": [
+        "challenge",
+        "near_duplicate"
+      ]
+    },
+    {
+      "id": "extra-train_negative",
+      "query": "Il rimborso già approvato, non quello ancora in attesa",
+      "relevant_documents": [
+        "refund_train"
+      ],
+      "slices": [
+        "challenge",
+        "negation"
+      ]
+    },
+    {
+      "id": "long-late",
+      "query": "Ho perso la chiave del laboratorio, chi può aiutarmi?",
+      "relevant_documents": [
+        "workshop_manual"
+      ],
+      "slices": [
+        "challenge",
+        "long_document"
+      ]
+    },
+    {
+      "id": "long-filter",
+      "query": "Come restituire gli strumenti presi in prestito?",
+      "tags": [
+        "challenge",
+        "manuale"
+      ],
+      "relevant_documents": [
+        "workshop_manual"
+      ],
+      "slices": [
+        "challenge",
+        "long_document",
+        "tag_filter"
+      ]
+    },
+    {
+      "id": "tag-version",
+      "query": "istruzioni accesso rete",
+      "tags": [
+        "challenge",
+        "version"
+      ],
+      "relevant_documents": [
+        "wifi_old",
+        "wifi_new"
+      ],
+      "slices": [
+        "challenge",
+        "tag_filter",
+        "multiple"
+      ]
+    },
+    {
+      "id": "absent-one",
+      "query": "Il certificato di registrazione della mia barca a vela",
+      "relevant_documents": [],
+      "slices": [
+        "unanswerable"
+      ]
+    },
+    {
+      "id": "absent-two",
+      "query": "La prenotazione del viaggio in Antartide del 2030",
+      "relevant_documents": [],
+      "slices": [
+        "unanswerable"
+      ]
+    },
+    {
+      "id": "absent-filter",
+      "query": "Il contratto della casa",
+      "tags": [
+        "inesistente"
+      ],
+      "relevant_documents": [],
+      "slices": [
+        "unanswerable",
+        "tag_filter"
+      ]
+    }
+  ]
+}

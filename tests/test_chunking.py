@@ -82,8 +82,44 @@ def test_long_sentence_is_split_into_words():
     assert split_units("a b c d e f g", 3, words) == ["a b c", "d e f", "g"]
 
 
-def test_split_words_keeps_an_oversized_word_whole():
-    assert split_words("supercalifragilistic", 0, words) == ["supercalifragilistic"]
+def test_split_words_rejects_a_zero_token_budget():
+    with pytest.raises(ValueError, match="positive"):
+        split_words("supercalifragilistic", 0, words)
+
+
+@pytest.mark.parametrize("text", ["contratto" * 500, "漢字🛰️" * 100, "a" * 10001])
+def test_oversized_words_are_split_without_losing_characters(text):
+    chunks = chunk_text(text, 40, 0, len)
+    assert len(chunks) > 1
+    assert all(0 < len(chunk) <= 40 for chunk in chunks)
+    assert "".join("".join(chunks).split()) == text
+
+
+def test_oversized_word_between_normal_words_preserves_order():
+    text = "before " + "abcdefgh" * 20 + " after"
+    chunks = chunk_text(text, 20, 3, len)
+    assert all(len(chunk) <= 20 for chunk in chunks)
+    assert "".join("".join(chunks).split()) == "".join(text.split())
+
+
+def test_long_word_splitting_checks_nonmonotonic_token_counts():
+    def count(text):
+        return 10 if text == "ab" else len(text)
+
+    pieces = split_words("abcdefgh", 3, count)
+    assert all(count(piece) <= 3 for piece in pieces)
+    assert "".join(pieces) == "abcdefgh"
+
+
+def test_character_exceeding_the_budget_fails_without_returning_oversized_chunks():
+    with pytest.raises(ValueError, match="single character"):
+        chunk_text("🛰", 1, 0, lambda text: len(text.encode("utf-8")))
+
+
+@pytest.mark.parametrize(("maximum", "overlap"), [(0, 0), (-1, 0), (4, -1), (4, 4), (4, 5)])
+def test_invalid_chunk_budgets_are_rejected_even_for_empty_text(maximum, overlap):
+    with pytest.raises(ValueError):
+        chunk_text("", maximum, overlap, words)
 
 
 # --- Overlap -----------------------------------------------------------------------

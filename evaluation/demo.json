@@ -1,0 +1,147 @@
+{
+  "description": "Fictional Italian personal archive. Fixed development fixture, not an independent model benchmark or user data.",
+  "documents": [
+    {
+      "key": "boiler_replacement",
+      "tags": ["casa", "riscaldamento"],
+      "text": "# Installazione del generatore termico\nIl 18 novembre 2025 la ditta Termica Nord ha rimosso il vecchio apparecchio del riscaldamento e installato una caldaia a condensazione. Il costo complessivo della sostituzione è di 2.400 euro, inclusi montaggio e smaltimento. Garanzia di due anni sul nuovo impianto. Questo documento riguarda l'acquisto e l'installazione, non la manutenzione annuale."
+    },
+    {
+      "key": "boiler_service",
+      "tags": ["casa", "riscaldamento"],
+      "text": "# Controllo periodico dell'impianto termico\nIl tecnico ha effettuato la pulizia del bruciatore e l'analisi dei fumi il 9 ottobre 2026. La manutenzione annuale della caldaia è costata 95 euro. Il rendimento risulta regolare e il libretto è aggiornato. Prossima verifica consigliata fra dodici mesi. Non sono stati acquistati o sostituiti apparecchi."
+    },
+    {
+      "key": "electricity_bill",
+      "tags": ["casa", "energia"],
+      "text": "# Fattura energia elettrica di febbraio\nFornitura dell'appartamento in via dei Tigli. Nel mese di febbraio 2026 il consumo di corrente è stato di 142 kWh. Totale della bolletta della luce: 58,70 euro. Addebito sul conto il 18 marzo. Il codice cliente è EL-4827. Non comprende la fornitura di gas."
+    },
+    {
+      "key": "gas_bill",
+      "tags": ["casa", "energia"],
+      "text": "# Bolletta metano di febbraio\nIl consumo di gas naturale dell'appartamento in via dei Tigli per febbraio 2026 è di 86 metri cubi. Il gas alimenta i fornelli e il riscaldamento domestico. Importo della fattura: 112,40 euro, con scadenza il 22 marzo. Codice utenza GAS-7193. La luce è fatturata separatamente."
+    },
+    {
+      "key": "home_lease",
+      "tags": ["casa", "contratti"],
+      "text": "# Contratto di locazione dell'abitazione\nAppartamento al secondo piano in via dei Tigli, composto da soggiorno, camera e cucina. Canone mensile di 720 euro e deposito cauzionale di 1.440 euro. Il contratto di affitto scade il 30 settembre 2028. Il preavviso per la disdetta è di sei mesi. Il posto auto non è incluso nel contratto."
+    },
+    {
+      "key": "parking_lease",
+      "tags": ["casa", "contratti"],
+      "text": "# Affitto del posto auto coperto\nLocazione del box numero 14 nel cortile di via dei Tigli. Il parcheggio costa 90 euro al mese. Il contratto del garage termina il 31 dicembre 2027 e può essere disdetto con preavviso di trenta giorni. Non riguarda la locazione dell'appartamento. Chiave del cancello consegnata all'inizio del rapporto."
+    },
+    {
+      "key": "home_insurance",
+      "tags": ["casa", "assicurazioni"],
+      "text": "# Polizza protezione abitazione\nCopertura assicurativa per incendio, perdite d'acqua e danni da grandine al tetto. Il premio annuale è di 184 euro. La franchigia per eventi atmosferici è di 250 euro. Il furto di biciclette lasciate all'aperto è escluso. Polizza CASA-6042, valida fino al 15 aprile 2027. Per aprire un sinistro occorre allegare fotografie e preventivi."
+    },
+    {
+      "key": "train_ticket",
+      "tags": ["viaggi", "treno"],
+      "text": "# Prenotazione ferroviaria per Torino\nViaggio in treno da Milano Centrale a Torino Porta Nuova il 12 giugno 2026. Partenza alle 08:10, arrivo alle 09:15. Carrozza 4, posto 22A. Codice di prenotazione TR-6428. Il biglietto ferroviario è costato 29 euro ed è modificabile prima della partenza. Il documento non include tratte aeree o pernottamenti."
+    },
+    {
+      "key": "flight_ticket",
+      "tags": ["viaggi", "aereo"],
+      "text": "# Conferma del volo per Lisbona\nVolo da Milano Malpensa a Lisbona il 3 luglio 2026. Decollo alle 14:35, atterraggio alle 16:30 ora locale. Prenotazione AER-9182, posto 18C. Tariffa di 146 euro con un bagaglio a mano. Il check-in apre quarantotto ore prima del decollo. Non è una prenotazione ferroviaria."
+    },
+    {
+      "key": "hotel_booking",
+      "tags": ["viaggi", "alloggi"],
+      "text": "# Soggiorno presso Casa del Porto\nConferma alberghiera a Lisbona per due persone dal 3 al 6 luglio 2026, tre notti. Camera doppia con colazione inclusa. Costo totale 276 euro, tassa di soggiorno esclusa. Cancellazione gratuita fino al 28 giugno. L'accettazione in hotel è disponibile dalle 15:00. La prenotazione riguarda soltanto il pernottamento."
+    },
+    {
+      "key": "dental_invoice",
+      "tags": ["salute", "ricevute"],
+      "text": "# Ricevuta dello studio odontoiatrico\nPrestazione del 21 maggio 2026: igiene orale professionale e otturazione di un molare. Onorario totale di 165 euro, saldato con carta. La fattura sanitaria numero OD-318 viene rilasciata per la detrazione fiscale. Non sono state effettuate visite oculistiche. Documento dimostrativo con dati interamente inventati."
+    },
+    {
+      "key": "eye_exam",
+      "tags": ["salute", "referti"],
+      "text": "# Controllo della vista\nVisita oculistica del 4 settembre 2026. La prescrizione degli occhiali indica una correzione di -1,25 diottrie a destra e -1,50 a sinistra. Pressione oculare nei limiti. Consigliato un controllo tra un anno. Il referto riguarda la vista e non contiene cure odontoiatriche. Dati fittizi per dimostrazione."
+    },
+    {
+      "key": "vet_visit",
+      "tags": ["animali", "ricevute"],
+      "text": "# Visita veterinaria del gatto\nRichiamo del vaccino e controllo generale di un felino domestico il 16 marzo 2026. Il veterinario ha aggiornato il libretto sanitario. Peso registrato: 4,2 chilogrammi. Costo della visita e della vaccinazione: 68 euro. Prossimo richiamo tra dodici mesi. Animale e prestazione sono inventati per il corpus dimostrativo."
+    },
+    {
+      "key": "bike_purchase",
+      "tags": ["bicicletta", "acquisti"],
+      "text": "# Acquisto della bicicletta da città\nRicevuta del negozio Due Ruote per una bici urbana modello Vela, telaio blu, misura M. Prezzo di acquisto 480 euro, pagato il 7 aprile 2026. La garanzia sul telaio dura cinque anni. Numero di telaio BICI-5038. Casco e lucchetto sono stati acquistati separatamente. Non si tratta di una riparazione."
+    },
+    {
+      "key": "bike_repair",
+      "tags": ["bicicletta", "manutenzione"],
+      "text": "# Riparazione in officina ciclistica\nIntervento sulla bicicletta il 19 agosto 2026: sostituzione della camera d'aria posteriore, centratura della ruota e registrazione dei freni. Il costo complessivo della riparazione è di 42 euro. Il meccanico raccomanda di controllare la pressione degli pneumatici ogni mese. Non è stato acquistato un nuovo veicolo."
+    },
+    {
+      "key": "laptop_warranty",
+      "tags": ["informatica", "garanzie"],
+      "text": "# Garanzia del computer portatile\nNotebook modello Aurora 14, acquistato il 2 febbraio 2026 per 899 euro. Copertura per difetti di fabbricazione fino al 2 febbraio 2028. Per richiedere assistenza occorrono prova d'acquisto e seriale NB-2846. Danni da liquidi e cadute sono esclusi. La batteria è coperta per il primo anno."
+    },
+    {
+      "key": "sql_notes",
+      "tags": ["studio", "informatica"],
+      "text": "# Appunti sulle basi di dati relazionali\nUna JOIN collega righe di tabelle diverse mediante colonne comuni. Le chiavi esterne mantengono l'integrità dei riferimenti. Una transazione SQL raggruppa aggiornamenti atomici: COMMIT li conferma, ROLLBACK li annulla. Gli indici accelerano le letture ma aggiungono lavoro alle scritture. SQLite conserva il database in un file locale."
+    },
+    {
+      "key": "neural_notes",
+      "tags": ["studio", "informatica"],
+      "text": "# Appunti sull'apprendimento delle reti neurali\nLa retropropagazione calcola il gradiente della funzione di perdita rispetto ai pesi del modello. La discesa del gradiente aggiorna i parametri per ridurre l'errore. Un embedding rappresenta il significato di un testo mediante un vettore numerico. L'addestramento contrastivo avvicina esempi simili e allontana quelli differenti."
+    },
+    {
+      "key": "library_receipt",
+      "tags": ["cultura", "libri"],
+      "text": "# Prestito della biblioteca civica\nPreso in prestito il romanzo Il sentiero dei giardini il 10 ottobre 2026. La restituzione del libro è prevista entro il 9 novembre. È ammesso un rinnovo di trenta giorni se non vi sono prenotazioni. Tessera dimostrativa LIB-5721. Il prestito è gratuito e non equivale all'acquisto del volume."
+    },
+    {
+      "key": "museum_ticket",
+      "tags": ["cultura", "biglietti"],
+      "text": "# Ingresso alla mostra di fotografia\nBiglietto per l'esposizione Luci sul porto presso il Museo Civico, domenica 25 ottobre 2026 alle 11:00. Prezzo 12 euro. L'ingresso comprende le sale della mostra temporanea ma non la visita guidata. Conservare il codice QR fino all'uscita. Mostra e museo sono inventati per questo esempio."
+    }
+  ],
+  "queries": [
+    {"query": "Quanto ho pagato per sostituire il vecchio impianto di riscaldamento?", "relevant_documents": ["boiler_replacement"]},
+    {"query": "La garanzia dell'apparecchio a condensazione appena installato", "relevant_documents": ["boiler_replacement"]},
+    {"query": "Il rapporto del tecnico che ha pulito il bruciatore e controllato i fumi", "relevant_documents": ["boiler_service"]},
+    {"query": "Quando devo rifare la manutenzione annuale della caldaia?", "relevant_documents": ["boiler_service"]},
+    {"query": "La fattura con i chilowattora consumati in febbraio", "relevant_documents": ["electricity_bill"]},
+    {"query": "Quanto è costata la corrente elettrica dell'appartamento?", "relevant_documents": ["electricity_bill"], "tags": ["casa", "energia"]},
+    {"query": "Il conto del metano con 86 metri cubi di consumo", "relevant_documents": ["gas_bill"]},
+    {"query": "Le bollette dei consumi di energia domestica di febbraio", "relevant_documents": ["gas_bill", "electricity_bill"]},
+    {"query": "Quanto preavviso serve per lasciare l'appartamento in affitto?", "relevant_documents": ["home_lease"]},
+    {"query": "Il contratto di casa con il deposito di 1440 euro", "relevant_documents": ["home_lease"]},
+    {"query": "Quando scade l'affitto del box dove parcheggio?", "relevant_documents": ["parking_lease"]},
+    {"query": "Il documento del garage da novanta euro mensili", "relevant_documents": ["parking_lease"]},
+    {"query": "L'assicurazione copre il tetto danneggiato dalla grandine?", "relevant_documents": ["home_insurance"]},
+    {"query": "La franchigia per gli eventi atmosferici sulla casa", "relevant_documents": ["home_insurance"]},
+    {"query": "Il biglietto per andare a Torino in ferrovia", "relevant_documents": ["train_ticket"]},
+    {"query": "Dove sono seduto sul treno del 12 giugno?", "relevant_documents": ["train_ticket"]},
+    {"query": "La conferma dell'aereo da Malpensa al Portogallo", "relevant_documents": ["flight_ticket"]},
+    {"query": "Quanto bagaglio posso portare sul volo per Lisbona?", "relevant_documents": ["flight_ticket"]},
+    {"query": "La prenotazione per dormire tre notti a Lisbona", "relevant_documents": ["hotel_booking"]},
+    {"query": "Fino a quando posso annullare l'albergo senza pagare?", "relevant_documents": ["hotel_booking"]},
+    {"query": "La ricevuta del dentista per l'otturazione", "relevant_documents": ["dental_invoice"]},
+    {"query": "Quanto ho speso per farmi curare i denti?", "relevant_documents": ["dental_invoice"]},
+    {"query": "Il referto con le diottrie per rifare gli occhiali", "relevant_documents": ["eye_exam"]},
+    {"query": "La visita che misura la pressione degli occhi", "relevant_documents": ["eye_exam"]},
+    {"query": "Quando è previsto il prossimo vaccino del gatto?", "relevant_documents": ["vet_visit"]},
+    {"query": "La spesa per il richiamo dal veterinario", "relevant_documents": ["vet_visit"]},
+    {"query": "Lo scontrino della bici urbana blu comprata ad aprile", "relevant_documents": ["bike_purchase"]},
+    {"query": "Dove trovo il numero del telaio della mia bicicletta?", "relevant_documents": ["bike_purchase"]},
+    {"query": "Il conto dell'officina per la gomma bucata e i freni", "relevant_documents": ["bike_repair"]},
+    {"query": "Quanto ho pagato per sistemare la ruota posteriore?", "relevant_documents": ["bike_repair"]},
+    {"query": "Fino a quando è coperto il portatile per difetti?", "relevant_documents": ["laptop_warranty"]},
+    {"query": "I documenti necessari per mandare il notebook in assistenza", "relevant_documents": ["laptop_warranty"]},
+    {"query": "Gli appunti che spiegano come collegare due tabelle", "relevant_documents": ["sql_notes"]},
+    {"query": "Come annullare gli aggiornamenti di una transazione SQLite?", "relevant_documents": ["sql_notes"], "tags": ["studio", "informatica"]},
+    {"query": "Le note su come si aggiornano i pesi durante l'addestramento", "relevant_documents": ["neural_notes"]},
+    {"query": "La spiegazione dei vettori che rappresentano il significato delle frasi", "relevant_documents": ["neural_notes"]},
+    {"query": "Entro quando devo riportare il romanzo preso in prestito?", "relevant_documents": ["library_receipt"]},
+    {"query": "Posso rinnovare il libro della biblioteca per un altro mese?", "relevant_documents": ["library_receipt"]},
+    {"query": "Il biglietto della mostra fotografica al museo", "relevant_documents": ["museum_ticket"]},
+    {"query": "A che ora posso entrare a vedere Luci sul porto?", "relevant_documents": ["museum_ticket"]}
+  ]
+}

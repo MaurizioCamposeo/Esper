@@ -114,6 +114,8 @@ class FakeEmbedder:
     """Record received text and return unit vectors without loading a model."""
 
     def __init__(self):
+        self.model_name = "test/model"
+        self.dimensions = EMBEDDING_DIMENSIONS
         self.calls = []
 
     def count_tokens(self, text):
@@ -121,7 +123,7 @@ class FakeEmbedder:
 
     def embed(self, texts):
         self.calls.append(list(texts))
-        return vectors_for(len(texts))
+        return vectors_for(len(texts), self.dimensions)
 
 
 @pytest.fixture
@@ -200,7 +202,7 @@ def test_index_document_handles_an_empty_file(conn, make_file, files_dir, embedd
 def test_index_document_records_extraction_errors(
     conn, make_file, files_dir, embedder, failure
 ):
-    name = "missing.txt" if failure == "missing_file" else "unsupported.pdf"
+    name = "missing.txt" if failure == "missing_file" else "unsupported.bin"
     document_id = import_file(conn, make_file(name, "Sample content."), files_dir)[0]
     if failure == "missing_file":
         stored_name = conn.execute(
@@ -269,7 +271,7 @@ def test_index_document_allows_keyboard_interrupt_and_leaves_processing_status(
 def test_index_queued_recovers_interrupted_work_and_continues_after_failure(
     conn, document_id, make_file, files_dir, embedder
 ):
-    bad_id = import_file(conn, make_file("unsupported.pdf", "Unsupported document."), files_dir)[0]
+    bad_id = import_file(conn, make_file("unsupported.bin", "Unsupported document."), files_dir)[0]
     next_id = import_file(conn, make_file("next.txt", "Next document."), files_dir)[0]
     interrupted_id = import_file(conn, make_file("interrupted.txt", "Interrupted document."), files_dir)[0]
     indexed_id = import_file(conn, make_file("indexed.txt", "Already indexed."), files_dir)[0]

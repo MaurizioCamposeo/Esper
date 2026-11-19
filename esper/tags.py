@@ -54,3 +54,20 @@ def remove_tag(conn: sqlite3.Connection, document_id: int, tag_name: str) -> Non
     with conn:
         conn.execute("DELETE FROM document_tags WHERE document_id = ? AND tag_id IN (SELECT id FROM tags WHERE name = ?)", (document_id, tag_name,))
         delete_unused_tags(conn)
+
+
+def set_document_tags(conn: sqlite3.Connection, document_id: int, names: list[str]) -> list[str]:
+    """Replace a document's complete tag set atomically after validating all names."""
+    normalized = sorted({normalize_tag(name) for name in names})
+    with conn:
+        if conn.execute("SELECT 1 FROM documents WHERE id = ?", (document_id,)).fetchone() is None:
+            raise ValueError(f"no document #{document_id}")
+        conn.execute("DELETE FROM document_tags WHERE document_id = ?", (document_id,))
+        for name in normalized:
+            conn.execute("INSERT OR IGNORE INTO tags (name) VALUES (?)", (name,))
+            conn.execute(
+                "INSERT INTO document_tags (document_id, tag_id) "
+                "SELECT ?, id FROM tags WHERE name = ?", (document_id, name),
+            )
+        delete_unused_tags(conn)
+    return normalized
